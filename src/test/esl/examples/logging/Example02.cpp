@@ -21,7 +21,7 @@ esl::logging::appender::OStream appenderOstream(std::cout, std::cout, std::cout,
 
 void simpleInitialize() {
 	/* Now we want to add this appender instance to the logging framework */
-	esl::logging::Logger::addAppender(appenderOstream);
+	esl::logging::addAppender(appenderOstream);
 
 	/* you can add multiple appenders and each appender has settings, but that's enough for now. */
 }
@@ -34,7 +34,7 @@ void testFunction() {
 	 *   or your full qualified namespace if you use a global available logger for a namespace.
 	 */
 	/* creating a logger class */
-	static esl::logging::Logger logger("exmaple02");
+	static esl::logging::Logger<> logger("exmaple02");
 
 	/* Now you will see your output */
 	logger.info << "Hello again!" << std::endl;

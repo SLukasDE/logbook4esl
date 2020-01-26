@@ -7,7 +7,7 @@ namespace logging {
 
 void example01() {
 	/* creating a logger class */
-	esl::logging::Logger logger;
+	esl::logging::Logger<> logger;
 
 	/* That's it, now you can use it already */
 	logger.info << "Hello world!" << std::endl;

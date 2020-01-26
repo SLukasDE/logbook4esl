@@ -1,6 +1,6 @@
 /*
 MIT License
-Copyright (c) 2019 Sven Lukas
+Copyright (c) 2019, 2020 Sven Lukas
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ SOFTWARE.
 #define LOGBOOK4ESL_APPENDER_H_
 
 #include <logbook/Appender.h>
+#include <logbook/Location.h>
 #include <esl/logging/Appender.h>
 #include <esl/logging/Interface.h>
 #include <functional>
@@ -37,8 +38,8 @@ public:
 	esl::logging::Appender& eslAppender;
 
 protected:
-	void flushNewLine(const logbook::Id& id, bool enabled) override;
-	void write(const logbook::Id& id, bool enabled, const char* ptr, std::size_t size) override;
+	void flushNewLine(const logbook::Location& location, bool enabled) override;
+	void write(const logbook::Location& location, bool enabled, const char* ptr, std::size_t size) override;
 };
 
 } /* namespace logbook4esl */

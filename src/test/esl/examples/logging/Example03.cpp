@@ -1,5 +1,6 @@
 #include <esl/examples/logging/Example03.h>
 #include <esl/logging/appender/OStream.h>
+#include <iostream>
 
 namespace esl {
 namespace examples {
@@ -19,7 +20,7 @@ esl::logging::appender::OStream appenderOstream(std::cout, std::cout, std::cout,
 /* Now we are using a logger within a class. This is where it becomes very interesting for professional usage.
  * First we put an static instance into the private section and initialize it with the full qualified name class name.
  */
-esl::logging::Logger Example03::logger = "esl::examples::logger::Example03";
+esl::logging::Logger<> Example03::logger = "esl::examples::logger::Example03";
 
 float Example03::divide(float a, float b) {
 	if(b != 0) {
@@ -43,7 +44,7 @@ float Example03::divide(float a, float b) {
 
 void example03() {
 	/* Initialize the logger framework */
-	esl::logging::Logger::addAppender(appenderOstream);
+	esl::logging::addAppender(appenderOstream);
 
 	/* each appender has a layout to specify which columns we want to see.
 	 * Let's play a little bit with this feature ... */
@@ -69,8 +70,8 @@ void example03() {
 	 * It is possible to specify for each path and it's sub paths a different log level.
 	 * Here we want to make all log messages silent but for class Example03 we want to get all log messages up to "WARN"-level.
 	 */
-	esl::logging::Logger::setLevel(esl::logging::Level::SILENT, "*");
-	esl::logging::Logger::setLevel(esl::logging::Level::WARN, "esl::examples::logger::Example03");
+	esl::logging::setLevel(esl::logging::Level::SILENT, "*");
+	esl::logging::setLevel(esl::logging::Level::WARN, "esl::examples::logger::Example03");
 
 	/* now let's test it! */
 	Example03 e;

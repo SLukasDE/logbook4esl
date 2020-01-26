@@ -1,6 +1,6 @@
 /*
 MIT License
-Copyright (c) 2019 Sven Lukas
+Copyright (c) 2019, 2020 Sven Lukas
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,10 @@ SOFTWARE.
 
 #include <esl/logging/Interface.h>
 #include <esl/logging/Appender.h>
-#include <esl/bootstrap/Interface.h>
+#include <esl/logging/Level.h>
+#include <esl/module/Interface.h>
+
+#include <memory>
 #include <new>         // placement new
 #include <type_traits> // aligned_storage
 
@@ -39,22 +42,17 @@ namespace logbook4esl {
 
 
 namespace {
-class Module : public esl::bootstrap::Module {
+class Module : public esl::module::Module {
 public:
-	Module() = default;
-	~Module() = default;
-
-	static void initialize();
+	Module();
 
 	std::recursive_mutex loggerMutex;
 	std::vector<std::unique_ptr<Appender>> appenders;
-
-private:
-	esl::logging::Interface interfaceLogging;
 };
 
 typename std::aligned_storage<sizeof(Module), alignof(Module)>::type moduleBuffer; // memory for the object;
 Module& module = reinterpret_cast<Module&> (moduleBuffer);
+bool isInitialized = false;
 
 logbook::Level eslLoggingLevel2logbookLevel(esl::logging::Level logLevel) {
 	switch(logLevel) {
@@ -108,18 +106,29 @@ std::vector<std::reference_wrapper<esl::logging::Appender>> getAppenders() {
 	return rv;
 }
 
+bool& isEnabled(const char* typeName, esl::logging::Level aLevel) {
+	logbook::Level level = eslLoggingLevel2logbookLevel(aLevel);
 
-std::pair<std::reference_wrapper<std::ostream>, void*> addWriter(esl::logging::Id aId, bool** enabled) {
-	logbook::Level level = eslLoggingLevel2logbookLevel(aId.level);
-	logbook::Id id(level, aId.object, aId.typeName, aId.function, aId.file, aId.line, aId.threadId);
-	std::pair<logbook::Id*, std::reference_wrapper<std::ostream>> rv = logbook::Internal::pushCurrent(id, enabled);
+	return logbook::Internal::isEnabled(typeName, level);
+}
+
+std::pair<std::reference_wrapper<std::ostream>, void*> addWriter(const esl::logging::Location& aLocation, bool** enabled) {
+	logbook::Level level = eslLoggingLevel2logbookLevel(aLocation.level);
+	logbook::Location location(level, aLocation.object, aLocation.typeName, aLocation.function, aLocation.file, aLocation.line, aLocation.threadId);
+
+	// check if pointer has been set already. So we call this expensive function only once.
+	if((*enabled) == nullptr) {
+		*enabled = &logbook::Internal::isEnabled(aLocation.typeName, level);
+	}
+
+	std::pair<logbook::Location*, std::reference_wrapper<std::ostream>> rv = logbook::Internal::pushCurrent(location, enabled);
 	return std::make_pair(rv.second, static_cast<void*>(rv.first));
 }
 
 void removeWriter(std::ostream& ostream, void* data) {
 	if(data) {
-		logbook::Id& id(*static_cast<logbook::Id*>(data));
-		logbook::Internal::popCurrent(static_cast<std::stringstream&>(ostream), id);
+		logbook::Location& location(*static_cast<logbook::Location*>(data));
+		logbook::Internal::popCurrent(static_cast<std::stringstream&>(ostream), location);
 	}
 	else {
 		logbook::Internal::popCurrent();
@@ -130,25 +139,27 @@ unsigned int getThreadNo(std::thread::id threadId) {
 	return logbook::Internal::getThreadNo(threadId);
 }
 
-void Module::initialize() {
-	static bool isInitialized = false;
+Module::Module()
+: esl::module::Module()
+{
+	esl::module::Module::initialize(*this);
 
+	addInterface(std::unique_ptr<const esl::module::Interface>(new esl::logging::Interface(
+			getId(), "",
+			setUnblocked, setLevel, addAppender, getAppenders, isEnabled, addWriter, removeWriter, getThreadNo)));
+}
+
+} /* anonymous namespace */
+
+const esl::module::Module& getModule() {
 	if(isInitialized == false) {
-		isInitialized = true;
-
 		/* ***************** *
 		 * initialize module *
 		 * ***************** */
-		new (&module) Module(); // placement new
-		esl::bootstrap::Module::initialize(module);
-		esl::logging::Interface::initialize(module.interfaceLogging, setUnblocked, setLevel, addAppender, getAppenders, addWriter, removeWriter, getThreadNo);
-		module.interfacesProvided.next = &module.interfaceLogging;
-	}
-}
-}
 
-const esl::bootstrap::Module& getModule() {
-	Module::initialize();
+		isInitialized = true;
+		new (&module) Module(); // placement new
+	}
 	return module;
 }
 

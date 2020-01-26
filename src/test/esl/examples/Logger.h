@@ -6,7 +6,7 @@
 namespace esl {
 namespace examples {
 
-extern esl::logging::Logger logger;
+extern esl::logging::Logger<> logger;
 void loggerInitialize();
 void loggerReplay();
 

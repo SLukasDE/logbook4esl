@@ -15,7 +15,7 @@ public:
 	float divide(float a, float b);
 
 private:
-	static esl::logging::Logger logger;
+	static esl::logging::Logger<> logger;
 };
 
 void example03();

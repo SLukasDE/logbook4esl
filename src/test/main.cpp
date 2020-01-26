@@ -18,7 +18,7 @@ void printUsage() {
 }
 
 int main(int argc, const char *argv[]) {
-	esl::addModule(logbook4esl::getModule());
+	esl::getModule().addModule(logbook4esl::getModule());
 	std::string argument;
 
 	if(argc < 2) {

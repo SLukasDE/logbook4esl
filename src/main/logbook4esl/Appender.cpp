@@ -1,6 +1,6 @@
 /*
 MIT License
-Copyright (c) 2019 Sven Lukas
+Copyright (c) 2019, 2020 Sven Lukas
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@ SOFTWARE.
 */
 
 #include <logbook4esl/Appender.h>
-#include <esl/logging/Id.h>
+#include <esl/logging/Location.h>
 
 namespace logbook4esl {
 namespace {
@@ -45,9 +45,9 @@ esl::logging::Level logbookLevel2eslLoggingLevel(logbook::Level logLevel) {
 	throw std::runtime_error("conversion error from logbook::Level to esl::logging::Level");
 }
 
-esl::logging::Id logbookId4eslLoggingId(const logbook::Id& id) {
-	esl::logging::Id eslId(logbookLevel2eslLoggingLevel(id.level), id.object, id.typeName, id.function, id.file, id.line, id.threadId);
-	return eslId;
+esl::logging::Location logbookLocation2eslLoggingLocation(const logbook::Location& location) {
+	esl::logging::Location eslLocation(logbookLevel2eslLoggingLevel(location.level), location.object, location.typeName, location.function, location.file, location.line, location.threadId);
+	return eslLocation;
 }
 }
 
@@ -56,12 +56,12 @@ Appender::Appender(esl::logging::Appender& aEslAppender)
   eslAppender(aEslAppender)
 { }
 
-void Appender::flushNewLine(const logbook::Id& id, bool enabled) {
-	esl::logging::Interface::appenderFlushNewLine(eslAppender, logbookId4eslLoggingId(id), enabled);
+void Appender::flushNewLine(const logbook::Location& location, bool enabled) {
+	esl::logging::Interface::appenderFlushNewLine(eslAppender, logbookLocation2eslLoggingLocation(location), enabled);
 }
 
-void Appender::write(const logbook::Id& id, bool enabled, const char* ptr, std::size_t size) {
-	esl::logging::Interface::appenderWrite(eslAppender, logbookId4eslLoggingId(id), enabled, ptr, size);
+void Appender::write(const logbook::Location& location, bool enabled, const char* ptr, std::size_t size) {
+	esl::logging::Interface::appenderWrite(eslAppender, logbookLocation2eslLoggingLocation(location), enabled, ptr, size);
 }
 
 } /* namespace logbook4esl */
