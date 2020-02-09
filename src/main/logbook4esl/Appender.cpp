@@ -22,6 +22,7 @@ SOFTWARE.
 
 #include <logbook4esl/Appender.h>
 #include <esl/logging/Location.h>
+#include <esl/logging/Interface.h>
 
 namespace logbook4esl {
 namespace {
@@ -47,6 +48,7 @@ esl::logging::Level logbookLevel2eslLoggingLevel(logbook::Level logLevel) {
 
 esl::logging::Location logbookLocation2eslLoggingLocation(const logbook::Location& location) {
 	esl::logging::Location eslLocation(logbookLevel2eslLoggingLevel(location.level), location.object, location.typeName, location.function, location.file, location.line, location.threadId);
+	eslLocation.enabled = location.enabled;
 	return eslLocation;
 }
 }
@@ -56,12 +58,12 @@ Appender::Appender(esl::logging::Appender& aEslAppender)
   eslAppender(aEslAppender)
 { }
 
-void Appender::flushNewLine(const logbook::Location& location, bool enabled) {
-	esl::logging::Interface::appenderFlushNewLine(eslAppender, logbookLocation2eslLoggingLocation(location), enabled);
+void Appender::flush() {
+	esl::logging::Interface::appenderFlush(eslAppender);
 }
 
-void Appender::write(const logbook::Location& location, bool enabled, const char* ptr, std::size_t size) {
-	esl::logging::Interface::appenderWrite(eslAppender, logbookLocation2eslLoggingLocation(location), enabled, ptr, size);
+void Appender::write(const logbook::Location& location, const char* ptr, std::size_t size) {
+	esl::logging::Interface::appenderWrite(eslAppender, logbookLocation2eslLoggingLocation(location), ptr, size);
 }
 
 } /* namespace logbook4esl */

@@ -22,8 +22,7 @@ SOFTWARE.
 
 #include <logbook4esl/Module.h>
 #include <logbook4esl/Appender.h>
-#include <logbook/Logger.h>
-#include <logbook/Internal.h>
+#include <logbook/Logbook.h>
 
 #include <esl/logging/Interface.h>
 #include <esl/logging/Appender.h>
@@ -45,9 +44,6 @@ namespace {
 class Module : public esl::module::Module {
 public:
 	Module();
-
-	std::recursive_mutex loggerMutex;
-	std::vector<std::unique_ptr<Appender>> appenders;
 };
 
 typename std::aligned_storage<sizeof(Module), alignof(Module)>::type moduleBuffer; // memory for the object;
@@ -74,69 +70,56 @@ logbook::Level eslLoggingLevel2logbookLevel(esl::logging::Level logLevel) {
 	throw std::runtime_error("conversion error from esl::logging::Level to logbook::Level");
 }
 
-void setUnblocked(bool isUnblocked) {
-	logbook::Logger::setUnblocked(isUnblocked);
-}
-
 void setLevel(esl::logging::Level aLogLevel, const std::string& typeName) {
 	logbook::Level logLevel = eslLoggingLevel2logbookLevel(aLogLevel);
-	logbook::Logger::setLevel(logLevel, typeName);
+	logbook::setLevel(logLevel, typeName);
 }
 
-
-void addAppender(esl::logging::Appender& appender) {
-    std::lock_guard<std::recursive_mutex> loggerLock(module.loggerMutex);
-
-    Appender* appenderPtr = new Appender(appender);
-	module.appenders.push_back(std::unique_ptr<Appender>(appenderPtr));
-
-    logbook::Logger::addAppender(*appenderPtr);
+void* addAppender(esl::logging::Appender& appender) {
+	return new Appender(appender);
 }
 
-std::vector<std::reference_wrapper<esl::logging::Appender>> getAppenders() {
-	std::vector<std::reference_wrapper<esl::logging::Appender>> rv;
-
-	{
-	    std::lock_guard<std::recursive_mutex> loggerLock(module.loggerMutex);
-		for(auto& appender : module.appenders) {
-			rv.push_back(std::ref(appender->eslAppender));
-		}
+void removeAppender(void* handle) {
+	if(handle) {
+		Appender* appender = static_cast<Appender*>(handle);
+		delete appender;
 	}
-
-	return rv;
 }
 
-bool& isEnabled(const char* typeName, esl::logging::Level aLevel) {
+bool isEnabled(const char* typeName, esl::logging::Level aLevel) {
 	logbook::Level level = eslLoggingLevel2logbookLevel(aLevel);
 
-	return logbook::Internal::isEnabled(typeName, level);
+	return logbook::isLoggingEnabled(typeName, level);
 }
 
-std::pair<std::reference_wrapper<std::ostream>, void*> addWriter(const esl::logging::Location& aLocation, bool** enabled) {
+class OStream : public esl::logging::OStream {
+public:
+	OStream(std::unique_ptr<logbook::Writer> aWriter)
+	: writer(std::move(aWriter))
+	{ }
+
+    std::ostream* getOStream() override {
+    	if(writer) {
+        	return writer->getOStream();
+    	}
+    	return nullptr;
+    }
+
+private:
+    std::unique_ptr<logbook::Writer> writer;
+};
+
+std::unique_ptr<esl::logging::OStream> createWriter(const esl::logging::Location& aLocation) {
 	logbook::Level level = eslLoggingLevel2logbookLevel(aLocation.level);
 	logbook::Location location(level, aLocation.object, aLocation.typeName, aLocation.function, aLocation.file, aLocation.line, aLocation.threadId);
 
-	// check if pointer has been set already. So we call this expensive function only once.
-	if((*enabled) == nullptr) {
-		*enabled = &logbook::Internal::isEnabled(aLocation.typeName, level);
-	}
+	std::unique_ptr<logbook::Writer> writer = logbook::createWriter(location);
 
-	std::pair<logbook::Location*, std::reference_wrapper<std::ostream>> rv = logbook::Internal::pushCurrent(location, enabled);
-	return std::make_pair(rv.second, static_cast<void*>(rv.first));
-}
-
-void removeWriter(std::ostream& ostream, void* data) {
-	if(data) {
-		logbook::Location& location(*static_cast<logbook::Location*>(data));
-		logbook::Internal::popCurrent(static_cast<std::stringstream&>(ostream), location);
-	}
-	else {
-		logbook::Internal::popCurrent();
-	}
+	return std::unique_ptr<esl::logging::OStream>(new OStream(std::move(writer)));
 }
 
 unsigned int getThreadNo(std::thread::id threadId) {
-	return logbook::Internal::getThreadNo(threadId);
+	return logbook::getThreadNo(threadId);
 }
 
 Module::Module()
@@ -146,7 +129,7 @@ Module::Module()
 
 	addInterface(std::unique_ptr<const esl::module::Interface>(new esl::logging::Interface(
 			getId(), "",
-			setUnblocked, setLevel, addAppender, getAppenders, isEnabled, addWriter, removeWriter, getThreadNo)));
+			logbook::setUnblocked, setLevel, addAppender, removeAppender, isEnabled, createWriter, getThreadNo)));
 }
 
 } /* anonymous namespace */

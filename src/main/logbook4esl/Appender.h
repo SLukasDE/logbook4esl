@@ -26,8 +26,6 @@ SOFTWARE.
 #include <logbook/Appender.h>
 #include <logbook/Location.h>
 #include <esl/logging/Appender.h>
-#include <esl/logging/Interface.h>
-#include <functional>
 
 namespace logbook4esl {
 
@@ -38,8 +36,8 @@ public:
 	esl::logging::Appender& eslAppender;
 
 protected:
-	void flushNewLine(const logbook::Location& location, bool enabled) override;
-	void write(const logbook::Location& location, bool enabled, const char* ptr, std::size_t size) override;
+	void flush() override;
+	void write(const logbook::Location& location, const char* ptr, std::size_t size) override;
 };
 
 } /* namespace logbook4esl */
