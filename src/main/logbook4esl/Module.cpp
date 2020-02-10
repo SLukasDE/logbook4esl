@@ -128,7 +128,7 @@ Module::Module()
 	esl::module::Module::initialize(*this);
 
 	addInterface(std::unique_ptr<const esl::module::Interface>(new esl::logging::Interface(
-			getId(), "",
+			getId(), "logbook",
 			logbook::setUnblocked, setLevel, addAppender, removeAppender, isEnabled, createWriter, getThreadNo)));
 }
 
