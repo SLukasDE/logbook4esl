@@ -27,7 +27,7 @@ SOFTWARE.
 
 namespace logbook4esl {
 
-const esl::module::Module& getModule();
+esl::module::Module& getModule();
 
 } /* namespace logbook4esl */
 
