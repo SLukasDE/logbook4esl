@@ -28,7 +28,9 @@ SOFTWARE.
 #include <esl/logging/Appender.h>
 #include <esl/logging/Level.h>
 #include <esl/module/Interface.h>
+#include <esl/Stacktrace.h>
 
+#include <stdexcept>
 #include <memory>
 #include <new>         // placement new
 #include <type_traits> // aligned_storage
@@ -128,22 +130,36 @@ Module::Module()
 	esl::module::Module::initialize(*this);
 
 	addInterface(std::unique_ptr<const esl::module::Interface>(new esl::logging::Interface(
-			getId(), "logbook",
+			getId(), "logbook4esl",
 			logbook::setUnblocked, setLevel, addAppender, removeAppender, isEnabled, createWriter, getThreadNo)));
 }
 
 } /* anonymous namespace */
 
-esl::module::Module& getModule() {
-	if(isInitialized == false) {
-		/* ***************** *
-		 * initialize module *
-		 * ***************** */
+esl::module::Module* getModulePointer(const std::string& moduleName) {
+	if(moduleName.empty() || moduleName != "logbook4esl") {
+		if(isInitialized == false) {
+			/* ***************** *
+			 * initialize module *
+			 * ***************** */
 
-		isInitialized = true;
-		new (&module) Module(); // placement new
+			isInitialized = true;
+			new (&module) Module(); // placement new
+		}
+		return &module;
 	}
-	return module;
+
+	return esl::getModulePointer(moduleName);
+}
+
+esl::module::Module& getModule(const std::string& moduleName) {
+	esl::module::Module* modulePointer = getModulePointer(moduleName);
+
+	if(modulePointer == nullptr) {
+		throw esl::addStacktrace(std::runtime_error("request for unknown module \"" + moduleName + "\""));
+	}
+
+	return *modulePointer;
 }
 
 } /* namespace logbook4esl */
