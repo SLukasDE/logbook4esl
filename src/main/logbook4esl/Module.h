@@ -24,11 +24,13 @@ SOFTWARE.
 #define LOGBOOK4ESL_MODULE_H_
 
 #include <esl/module/Module.h>
-#include <string>
 
 namespace logbook4esl {
 
-esl::module::Module& getModule();
+struct Module final {
+	Module() = delete;
+	static void install(esl::module::Module& module);
+};
 
 } /* namespace logbook4esl */
 

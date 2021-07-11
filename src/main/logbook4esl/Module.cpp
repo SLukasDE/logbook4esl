@@ -23,34 +23,19 @@ SOFTWARE.
 #include <logbook4esl/Module.h>
 #include <logbook4esl/Appender.h>
 #include <logbook/Logbook.h>
+#include <logbook/Level.h>
 
 #include <esl/logging/Interface.h>
 #include <esl/logging/Appender.h>
 #include <esl/logging/Level.h>
-#include <esl/module/Interface.h>
-#include <esl/Stacktrace.h>
+#include <esl/logging/Location.h>
+#include <esl/logging/OStream.h>
+#include <esl/Module.h>
 
-#include <stdexcept>
 #include <memory>
-#include <new>         // placement new
-#include <type_traits> // aligned_storage
-
-#include <vector>
-#include <functional>
-#include <mutex>
 
 namespace logbook4esl {
-
-
 namespace {
-class Module : public esl::module::Module {
-public:
-	Module();
-};
-
-typename std::aligned_storage<sizeof(Module), alignof(Module)>::type moduleBuffer; // memory for the object;
-Module* modulePtr = nullptr;
-
 logbook::Level eslLoggingLevel2logbookLevel(esl::logging::Level logLevel) {
 	switch(logLevel) {
 	case esl::logging::Level::TRACE:
@@ -123,30 +108,14 @@ std::unique_ptr<esl::logging::OStream> createWriter(const esl::logging::Location
 unsigned int getThreadNo(std::thread::id threadId) {
 	return logbook::getThreadNo(threadId);
 }
-
-Module::Module()
-: esl::module::Module()
-{
-	esl::module::Module::initialize(*this);
-
-	addInterface(esl::logging::Interface::createInterface(
-			"logbook4esl",
-			logbook::setUnblocked, setLevel, addAppender, removeAppender, isEnabled, createWriter, getThreadNo));
-}
-
 } /* anonymous namespace */
 
-esl::module::Module& getModule() {
-	if(modulePtr == nullptr) {
-		/* ***************** *
-		 * initialize module *
-		 * ***************** */
+void Module::install(esl::module::Module& module) {
+	esl::setModule(module);
 
-		modulePtr = reinterpret_cast<Module*> (&moduleBuffer);
-		new (modulePtr) Module; // placement new
-	}
-
-	return *modulePtr;
+	module.addInterface(esl::logging::Interface::createInterface(
+			"logbook4esl",
+			logbook::setUnblocked, setLevel, addAppender, removeAppender, isEnabled, createWriter, getThreadNo));
 }
 
 } /* namespace logbook4esl */
