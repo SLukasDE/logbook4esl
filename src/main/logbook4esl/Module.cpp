@@ -26,7 +26,7 @@ SOFTWARE.
 #include <logbook/Level.h>
 
 #include <esl/logging/Interface.h>
-#include <esl/logging/Appender.h>
+#include <esl/logging/appender/Interface.h>
 #include <esl/logging/Level.h>
 #include <esl/logging/Location.h>
 #include <esl/logging/OStream.h>
@@ -62,7 +62,7 @@ void setLevel(esl::logging::Level aLogLevel, const std::string& typeName) {
 	logbook::setLevel(logLevel, typeName);
 }
 
-void* addAppender(esl::logging::Appender& appender) {
+void* addAppender(esl::logging::appender::Interface::Appender& appender) {
 	return new Appender(appender);
 }
 

@@ -21,6 +21,7 @@ SOFTWARE.
 */
 
 #include <logbook4esl/Appender.h>
+
 #include <esl/logging/Location.h>
 #include <esl/logging/Interface.h>
 
@@ -53,7 +54,7 @@ esl::logging::Location logbookLocation2eslLoggingLocation(const logbook::Locatio
 }
 }
 
-Appender::Appender(esl::logging::Appender& aEslAppender)
+Appender::Appender(esl::logging::appender::Interface::Appender& aEslAppender)
 : logbook::Appender(),
   eslAppender(aEslAppender)
 { }

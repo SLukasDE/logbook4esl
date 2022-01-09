@@ -25,15 +25,16 @@ SOFTWARE.
 
 #include <logbook/Appender.h>
 #include <logbook/Location.h>
-#include <esl/logging/Appender.h>
+
+#include <esl/logging/appender/Interface.h>
 
 namespace logbook4esl {
 
 class Appender : public logbook::Appender {
 public:
-	Appender(esl::logging::Appender& eslAppender);
+	Appender(esl::logging::appender::Interface::Appender& eslAppender);
 
-	esl::logging::Appender& eslAppender;
+	esl::logging::appender::Interface::Appender& eslAppender;
 
 protected:
 	void flush() override;
