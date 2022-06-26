@@ -20,27 +20,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LOGBOOK4ESL_APPENDER_H_
-#define LOGBOOK4ESL_APPENDER_H_
+#ifndef LOGBOOK4ESL_PLUGIN_H_
+#define LOGBOOK4ESL_PLUGIN_H_
 
-#include <logbook/Appender.h>
-#include <logbook/Location.h>
-
-#include <esl/logging/IAppender.h>
+#include <esl/plugin/Registry.h>
 
 namespace logbook4esl {
 
-class Appender : public logbook::Appender {
+class Plugin final {
 public:
-	Appender(esl::logging::IAppender& eslAppender);
-
-	esl::logging::IAppender& eslAppender;
-
-protected:
-	void flush() override;
-	void write(const logbook::Location& location, const char* ptr, std::size_t size) override;
+	Plugin() = delete;
+	static void install(esl::plugin::Registry& registry, const char* data);
 };
 
 } /* namespace logbook4esl */
 
-#endif /* LOGBOOK4ESL_APPENDER_H_ */
+#endif /* LOGBOOK4ESL_PLUGIN_H_ */

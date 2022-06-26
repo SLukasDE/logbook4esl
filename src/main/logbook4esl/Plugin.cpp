@@ -20,18 +20,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LOGBOOK4ESL_MODULE_H_
-#define LOGBOOK4ESL_MODULE_H_
+#include <logbook4esl/Plugin.h>
+#include <logbook4esl/logging/Logger.h>
 
-#include <esl/module/Module.h>
+#include <esl/logging/ILogger.h>
+
+#include <memory>
 
 namespace logbook4esl {
 
-struct Module final {
-	Module() = delete;
-	static void install(esl::module::Module& module);
-};
+void Plugin::install(esl::plugin::Registry& registry, const char* data) {
+	esl::plugin::Registry::set(registry);
+
+	registry.addPlugin(std::unique_ptr<const esl::plugin::BasePlugin>(new esl::logging::ILogger::Plugin(
+			"logbook4esl/logging/Logger",
+			&logging::Logger::create)));
+}
 
 } /* namespace logbook4esl */
-
-#endif /* LOGBOOK4ESL_MODULE_H_ */

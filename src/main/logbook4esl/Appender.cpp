@@ -23,7 +23,7 @@ SOFTWARE.
 #include <logbook4esl/Appender.h>
 
 #include <esl/logging/Location.h>
-#include <esl/logging/Interface.h>
+#include <esl/logging/ILogger.h>
 
 namespace logbook4esl {
 namespace {
@@ -54,17 +54,19 @@ esl::logging::Location logbookLocation2eslLoggingLocation(const logbook::Locatio
 }
 }
 
-Appender::Appender(esl::logging::appender::Interface::Appender& aEslAppender)
+Appender::Appender(esl::logging::IAppender& aEslAppender)
 : logbook::Appender(),
   eslAppender(aEslAppender)
 { }
 
 void Appender::flush() {
-	esl::logging::Interface::appenderFlush(eslAppender);
+	eslAppender.flush();
+	//esl::logging::Interface::appenderFlush(eslAppender);
 }
 
 void Appender::write(const logbook::Location& location, const char* ptr, std::size_t size) {
-	esl::logging::Interface::appenderWrite(eslAppender, logbookLocation2eslLoggingLocation(location), ptr, size);
+	eslAppender.write(logbookLocation2eslLoggingLocation(location), ptr, size);
+	//esl::logging::Interface::appenderWrite(eslAppender, logbookLocation2eslLoggingLocation(location), ptr, size);
 }
 
 } /* namespace logbook4esl */

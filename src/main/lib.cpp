@@ -20,12 +20,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <logbook4esl/Module.h>
 
-#include <esl/Module.h>
+#include <logbook4esl/Plugin.h>
 
-extern "C" void esl__module__library__install(esl::module::Module* module) {
-	if(module != nullptr) {
-		logbook4esl::Module::install(*module);
+#include <esl/plugin/Registry.h>
+
+extern "C" void esl__plugin__library__install(esl::plugin::Registry* registry, const char* data) {
+	if(registry != nullptr) {
+		logbook4esl::Plugin::install(*registry, data);
 	}
 }

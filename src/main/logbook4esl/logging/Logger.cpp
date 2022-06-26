@@ -20,21 +20,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <logbook4esl/Module.h>
+#include <logbook4esl/logging/Logger.h>
 #include <logbook4esl/Appender.h>
+
+
 #include <logbook/Logbook.h>
 #include <logbook/Level.h>
 
-#include <esl/logging/Interface.h>
-#include <esl/logging/appender/Interface.h>
-#include <esl/logging/Level.h>
-#include <esl/logging/Location.h>
-#include <esl/logging/OStream.h>
-#include <esl/Module.h>
+#include <esl/system/stacktrace/IStacktrace.h>
 
-#include <memory>
+#include <stdexcept>
 
 namespace logbook4esl {
+namespace logging {
+
 namespace {
 logbook::Level eslLoggingLevel2logbookLevel(esl::logging::Level logLevel) {
 	switch(logLevel) {
@@ -56,29 +55,6 @@ logbook::Level eslLoggingLevel2logbookLevel(esl::logging::Level logLevel) {
 	throw std::runtime_error("conversion error from esl::logging::Level to logbook::Level");
 }
 
-void setLevel(esl::logging::Level aLogLevel, const std::string& typeName) {
-	logbook::Level logLevel = eslLoggingLevel2logbookLevel(aLogLevel);
-
-	logbook::setLevel(logLevel, typeName);
-}
-
-void* addAppender(esl::logging::appender::Interface::Appender& appender) {
-	return new Appender(appender);
-}
-
-void removeAppender(void* handle) {
-	if(handle) {
-		Appender* appender = static_cast<Appender*>(handle);
-		delete appender;
-	}
-}
-
-bool isEnabled(const char* typeName, esl::logging::Level aLevel) {
-	logbook::Level level = eslLoggingLevel2logbookLevel(aLevel);
-
-	return logbook::isLoggingEnabled(typeName, level);
-}
-
 class OStream : public esl::logging::OStream {
 public:
 	OStream(std::unique_ptr<logbook::Writer> aWriter)
@@ -95,8 +71,47 @@ public:
 private:
     std::unique_ptr<logbook::Writer> writer;
 };
+} /* anonymous namespace */
 
-std::unique_ptr<esl::logging::OStream> createWriter(const esl::logging::Location& aLocation) {
+std::unique_ptr<esl::logging::ILogger> Logger::create(const std::vector<std::pair<std::string, std::string>>& settings) {
+	return std::unique_ptr<esl::logging::ILogger>(new Logger(settings));
+}
+
+Logger::Logger(const std::vector<std::pair<std::string, std::string>>& settings) {
+    for(const auto& setting : settings) {
+        throw esl::system::stacktrace::IStacktrace::add(std::runtime_error("unknown attribute '\"" + setting.first + "\"'."));
+    }
+
+}
+
+void Logger::setUnblocked(bool isUnblocked) {
+	logbook::setUnblocked(isUnblocked);
+}
+
+void Logger::setLevel(esl::logging::Level aLogLevel, const std::string& typeName) {
+	logbook::Level logLevel = eslLoggingLevel2logbookLevel(aLogLevel);
+
+	logbook::setLevel(logLevel, typeName);
+}
+
+void* Logger::addAppender(esl::logging::IAppender& appender) {
+	return new Appender(appender);
+}
+
+void Logger::removeAppender(void* handle) {
+	if(handle) {
+		Appender* appender = static_cast<Appender*>(handle);
+		delete appender;
+	}
+}
+
+bool Logger::isEnabled(const char* typeName, esl::logging::Level aLevel) {
+	logbook::Level level = eslLoggingLevel2logbookLevel(aLevel);
+
+	return logbook::isLoggingEnabled(typeName, level);
+}
+
+std::unique_ptr<esl::logging::OStream> Logger::createOStream(const esl::logging::Location& aLocation) {
 	logbook::Level level = eslLoggingLevel2logbookLevel(aLocation.level);
 	logbook::Location location(level, aLocation.object, aLocation.typeName, aLocation.function, aLocation.file, aLocation.line, aLocation.threadId);
 
@@ -105,17 +120,10 @@ std::unique_ptr<esl::logging::OStream> createWriter(const esl::logging::Location
 	return std::unique_ptr<esl::logging::OStream>(new OStream(std::move(writer)));
 }
 
-unsigned int getThreadNo(std::thread::id threadId) {
+unsigned int Logger::getThreadNo(std::thread::id threadId) {
 	return logbook::getThreadNo(threadId);
 }
-} /* anonymous namespace */
 
-void Module::install(esl::module::Module& module) {
-	esl::setModule(module);
 
-	module.addInterface(esl::logging::Interface::createInterface(
-			"logbook4esl",
-			logbook::setUnblocked, setLevel, addAppender, removeAppender, isEnabled, createWriter, getThreadNo));
-}
-
+} /* namespace logging */
 } /* namespace logbook4esl */

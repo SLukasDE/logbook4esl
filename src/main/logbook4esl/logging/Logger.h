@@ -20,27 +20,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LOGBOOK4ESL_APPENDER_H_
-#define LOGBOOK4ESL_APPENDER_H_
+#ifndef LOGBOOK4ESL_LOGGING_LOGGER_H_
+#define LOGBOOK4ESL_LOGGING_LOGGER_H_
 
-#include <logbook/Appender.h>
-#include <logbook/Location.h>
-
+#include <esl/logging/ILogger.h>
 #include <esl/logging/IAppender.h>
+#include <esl/logging/Level.h>
+#include <esl/logging/Location.h>
+#include <esl/logging/OStream.h>
+
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace logbook4esl {
+namespace logging {
 
-class Appender : public logbook::Appender {
+class Logger : public esl::logging::ILogger {
 public:
-	Appender(esl::logging::IAppender& eslAppender);
+	static std::unique_ptr<esl::logging::ILogger> create(const std::vector<std::pair<std::string, std::string>>& settings);
 
-	esl::logging::IAppender& eslAppender;
+	Logger(const std::vector<std::pair<std::string, std::string>>& settings);
 
-protected:
-	void flush() override;
-	void write(const logbook::Location& location, const char* ptr, std::size_t size) override;
+	void setUnblocked(bool isUnblocked) override;
+	void setLevel(esl::logging::Level logLevel, const std::string& typeName) override;
+	void* addAppender(esl::logging::IAppender& appender) override;
+	void removeAppender(void* handle) override;
+	bool isEnabled(const char* typeName, esl::logging::Level level) override;
+	std::unique_ptr<esl::logging::OStream> createOStream(const esl::logging::Location& location) override;
+	unsigned int getThreadNo(std::thread::id threadId) override;
 };
 
+} /* namespace logging */
 } /* namespace logbook4esl */
 
-#endif /* LOGBOOK4ESL_APPENDER_H_ */
+#endif /* LOGBOOK4ESL_LOGGING_LOGGER_H_ */
