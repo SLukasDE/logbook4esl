@@ -21,9 +21,9 @@ SOFTWARE.
 */
 
 #include <logbook4esl/Plugin.h>
-#include <logbook4esl/logging/Logger.h>
+#include <logbook4esl/logging/Logging.h>
 
-#include <esl/logging/ILogger.h>
+#include <esl/logging/Logging.h>
 
 #include <memory>
 
@@ -32,9 +32,9 @@ namespace logbook4esl {
 void Plugin::install(esl::plugin::Registry& registry, const char* data) {
 	esl::plugin::Registry::set(registry);
 
-	registry.addPlugin(std::unique_ptr<const esl::plugin::BasePlugin>(new esl::logging::ILogger::Plugin(
+	registry.addPlugin<esl::logging::Logging>(
 			"logbook4esl/logging/Logger",
-			&logging::Logger::create)));
+			&logging::Logging::create);
 }
 
 } /* namespace logbook4esl */

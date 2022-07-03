@@ -20,14 +20,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <logbook4esl/logging/Logger.h>
-#include <logbook4esl/Appender.h>
+#include <logbook4esl/logging/Logging.h>
+#include <logbook4esl/logging/Appender.h>
 
 
 #include <logbook/Logbook.h>
 #include <logbook/Level.h>
 
-#include <esl/system/stacktrace/IStacktrace.h>
+#include <esl/system/Stacktrace.h>
 
 #include <stdexcept>
 
@@ -73,45 +73,45 @@ private:
 };
 } /* anonymous namespace */
 
-std::unique_ptr<esl::logging::ILogger> Logger::create(const std::vector<std::pair<std::string, std::string>>& settings) {
-	return std::unique_ptr<esl::logging::ILogger>(new Logger(settings));
+std::unique_ptr<esl::logging::Logging> Logging::create(const std::vector<std::pair<std::string, std::string>>& settings) {
+	return std::unique_ptr<esl::logging::Logging>(new Logging(settings));
 }
 
-Logger::Logger(const std::vector<std::pair<std::string, std::string>>& settings) {
+Logging::Logging(const std::vector<std::pair<std::string, std::string>>& settings) {
     for(const auto& setting : settings) {
-        throw esl::system::stacktrace::IStacktrace::add(std::runtime_error("unknown attribute '\"" + setting.first + "\"'."));
+        throw esl::system::Stacktrace::add(std::runtime_error("unknown attribute '\"" + setting.first + "\"'."));
     }
 
 }
 
-void Logger::setUnblocked(bool isUnblocked) {
+void Logging::setUnblocked(bool isUnblocked) {
 	logbook::setUnblocked(isUnblocked);
 }
 
-void Logger::setLevel(esl::logging::Level aLogLevel, const std::string& typeName) {
+void Logging::setLevel(esl::logging::Level aLogLevel, const std::string& typeName) {
 	logbook::Level logLevel = eslLoggingLevel2logbookLevel(aLogLevel);
 
 	logbook::setLevel(logLevel, typeName);
 }
 
-void* Logger::addAppender(esl::logging::IAppender& appender) {
+void* Logging::addAppender(esl::logging::Appender& appender) {
 	return new Appender(appender);
 }
 
-void Logger::removeAppender(void* handle) {
+void Logging::removeAppender(void* handle) {
 	if(handle) {
 		Appender* appender = static_cast<Appender*>(handle);
 		delete appender;
 	}
 }
 
-bool Logger::isEnabled(const char* typeName, esl::logging::Level aLevel) {
+bool Logging::isEnabled(const char* typeName, esl::logging::Level aLevel) {
 	logbook::Level level = eslLoggingLevel2logbookLevel(aLevel);
 
 	return logbook::isLoggingEnabled(typeName, level);
 }
 
-std::unique_ptr<esl::logging::OStream> Logger::createOStream(const esl::logging::Location& aLocation) {
+std::unique_ptr<esl::logging::OStream> Logging::createOStream(const esl::logging::Location& aLocation) {
 	logbook::Level level = eslLoggingLevel2logbookLevel(aLocation.level);
 	logbook::Location location(level, aLocation.object, aLocation.typeName, aLocation.function, aLocation.file, aLocation.line, aLocation.threadId);
 
@@ -120,7 +120,7 @@ std::unique_ptr<esl::logging::OStream> Logger::createOStream(const esl::logging:
 	return std::unique_ptr<esl::logging::OStream>(new OStream(std::move(writer)));
 }
 
-unsigned int Logger::getThreadNo(std::thread::id threadId) {
+unsigned int Logging::getThreadNo(std::thread::id threadId) {
 	return logbook::getThreadNo(threadId);
 }
 

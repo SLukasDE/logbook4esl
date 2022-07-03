@@ -20,12 +20,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <logbook4esl/Appender.h>
+#include <logbook4esl/logging/Appender.h>
 
 #include <esl/logging/Location.h>
-#include <esl/logging/ILogger.h>
+#include <esl/logging/Logging.h>
 
 namespace logbook4esl {
+namespace logging {
+
 namespace {
 esl::logging::Level logbookLevel2eslLoggingLevel(logbook::Level logLevel) {
 	switch(logLevel) {
@@ -54,7 +56,7 @@ esl::logging::Location logbookLocation2eslLoggingLocation(const logbook::Locatio
 }
 }
 
-Appender::Appender(esl::logging::IAppender& aEslAppender)
+Appender::Appender(esl::logging::Appender& aEslAppender)
 : logbook::Appender(),
   eslAppender(aEslAppender)
 { }
@@ -69,4 +71,5 @@ void Appender::write(const logbook::Location& location, const char* ptr, std::si
 	//esl::logging::Interface::appenderWrite(eslAppender, logbookLocation2eslLoggingLocation(location), ptr, size);
 }
 
+} /* namespace logging */
 } /* namespace logbook4esl */
