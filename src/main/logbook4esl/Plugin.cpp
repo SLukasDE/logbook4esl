@@ -33,7 +33,7 @@ void Plugin::install(esl::plugin::Registry& registry, const char* data) {
 	esl::plugin::Registry::set(registry);
 
 	registry.addPlugin<esl::logging::Logging>(
-			"logbook4esl/logging/Logger",
+			"logbook4esl/logging/Logging",
 			&logging::Logging::create);
 }
 
