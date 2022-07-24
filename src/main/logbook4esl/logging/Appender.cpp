@@ -56,19 +56,25 @@ esl::logging::Location logbookLocation2eslLoggingLocation(const logbook::Locatio
 }
 }
 
-Appender::Appender(esl::logging::Appender& aEslAppender)
+Appender::Appender(std::unique_ptr<esl::logging::Appender> aEslAppender)
 : logbook::Appender(),
-  eslAppender(aEslAppender)
+  eslAppender(std::move(aEslAppender))
 { }
 
+void Appender::flush(std::ostream* oStream) {
+	if(eslAppender) {
+		eslAppender->flush(oStream);
+	}
+}
+
 void Appender::flush() {
-	eslAppender.flush();
-	//esl::logging::Interface::appenderFlush(eslAppender);
+	flush(nullptr);
 }
 
 void Appender::write(const logbook::Location& location, const char* ptr, std::size_t size) {
-	eslAppender.write(logbookLocation2eslLoggingLocation(location), ptr, size);
-	//esl::logging::Interface::appenderWrite(eslAppender, logbookLocation2eslLoggingLocation(location), ptr, size);
+	if(eslAppender) {
+		eslAppender->write(logbookLocation2eslLoggingLocation(location), ptr, size);
+	}
 }
 
 } /* namespace logging */

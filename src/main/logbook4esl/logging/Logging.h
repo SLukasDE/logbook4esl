@@ -23,13 +23,21 @@ SOFTWARE.
 #ifndef LOGBOOK4ESL_LOGGING_LOGGING_H_
 #define LOGBOOK4ESL_LOGGING_LOGGING_H_
 
-#include <esl/logging/Logging.h>
+#include <logbook4esl/logging/Appender.h>
+
 #include <esl/logging/Appender.h>
+#include <esl/logging/Layout.h>
 #include <esl/logging/Level.h>
 #include <esl/logging/Location.h>
+#include <esl/logging/Logging.h>
 #include <esl/logging/OStream.h>
+#include <esl/logging/StreamReal.h>
 
+#include <boost/filesystem/path.hpp>
+
+#include <map>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -43,13 +51,35 @@ public:
 
 	Logging(const std::vector<std::pair<std::string, std::string>>& settings);
 
+	// NOT thread save - call it at the beginning if needed. Default is already "true"
+	// unblocked behavior makes other threads not waiting on logging, while current thread is writing to logger already.
+	// If logger is used already by current thread, other threads will write to a temporary buffer.
+	// - Temporary buffer is flushed to real logger, if other thread is done using the logger.
+	// - If logger is still used by current thread, buffer is queued.
+	// - If current thread is done using the logger, it flushes queued buffers.
 	void setUnblocked(bool isUnblocked) override;
+
+	// thread safe, quaranteed by configMutex
 	void setLevel(esl::logging::Level logLevel, const std::string& typeName) override;
-	void* addAppender(esl::logging::Appender& appender) override;
-	void removeAppender(void* handle) override;
+
 	bool isEnabled(const char* typeName, esl::logging::Level level) override;
 	std::unique_ptr<esl::logging::OStream> createOStream(const esl::logging::Location& location) override;
 	unsigned int getThreadNo(std::thread::id threadId) override;
+
+	void flush(std::ostream* oStream) override;
+
+	void addData(const std::string& configuration) override;
+	void addFile(const boost::filesystem::path& filename) override;
+
+	void addLayout(const std::string& id, std::unique_ptr<esl::logging::Layout> layout) override;
+
+	// thread safe, quaranteed by loggerMutex
+	void addAppender(const std::string& name, const std::string& layoutRefId, std::unique_ptr<esl::logging::Appender> appender) override;
+
+private:
+	std::map<std::string, std::unique_ptr<esl::logging::Layout>> layouts;
+	std::vector<std::pair<std::string, std::unique_ptr<Appender>>> appenders;
+	//std::vector<std::pair<std::string, std::unique_ptr<esl::logging::Appender>>> appenders;
 };
 
 } /* namespace logging */

@@ -28,18 +28,23 @@ SOFTWARE.
 
 #include <esl/logging/Appender.h>
 
+#include <ostream>
+
 namespace logbook4esl {
 namespace logging {
 
 class Appender : public logbook::Appender {
 public:
-	Appender(esl::logging::Appender& eslAppender);
+	Appender(std::unique_ptr<esl::logging::Appender> eslAppender);
 
-	esl::logging::Appender& eslAppender;
+	void flush(std::ostream* oStream);
 
 protected:
 	void flush() override;
 	void write(const logbook::Location& location, const char* ptr, std::size_t size) override;
+
+private:
+	std::unique_ptr<esl::logging::Appender> eslAppender;
 };
 
 } /* namespace logging */

@@ -1,12 +1,27 @@
-#include <esl/Module.h>
-#include <logbook4esl/Module.h>
-#include <esl/examples/logging/Example01.h>
-#include <esl/examples/logging/Example02.h>
-#include <esl/examples/logging/Example03.h>
-#include <esl/examples/logging/Example04.h>
+#include <esl/logging/Appender.h>
+#include <esl/logging/Layout.h>
+#include <esl/logging/Logging.h>
+#include <esl/logging/Logger.h>
+#include <esl/logging/Level.h>
+#include <esl/plugin/Registry.h>
+
+#include <logbook4esl/logging/Logging.h>
+
+#include <common4esl/logging/MemBufferAppender.h>
+#include <common4esl/logging/OStreamAppender.h>
+#include <common4esl/logging/DefaultLayout.h>
+
+#include <iostream>
+#include <memory>
+
+#include "logbook4esl/Example01.h"
+#include "logbook4esl/Example02.h"
+#include "logbook4esl/Example03.h"
+#include "logbook4esl/Example04.h"
+#include "logbook4esl/Example05.h"
+
 #include <iostream>
 #include <string>
-#include <esl/logging/Logger.h>
 
 
 void printUsage() {
@@ -15,10 +30,29 @@ void printUsage() {
 	std::cout << "  logging-example02\n";
 	std::cout << "  logging-example03\n";
 	std::cout << "  logging-example04\n";
+	std::cout << "  logging-example05\n";
 }
 
 int main(int argc, const char *argv[]) {
-	esl::getModule().addModule(logbook4esl::getModule());
+	esl::plugin::Registry::get().addPlugin<esl::logging::Logging>(
+			"eslx/logging/Logging",
+			&logbook4esl::logging::Logging::create);
+
+	esl::plugin::Registry::get().addPlugin<esl::logging::Appender>(
+			"eslx/logging/MemBufferAppender",
+			&common4esl::logging::MemBufferAppender::create);
+
+	esl::plugin::Registry::get().addPlugin<esl::logging::Appender>(
+			"eslx/logging/OStreamAppender",
+			&common4esl::logging::OStreamAppender::create);
+
+	esl::plugin::Registry::get().addPlugin<esl::logging::Layout>(
+			"eslx/logging/DefaultLayout",
+			&common4esl::logging::DefaultLayout::create);
+
+//	std::unique_ptr<esl::logging::Logging> aLogging(new logbook4esl::logging::Logging({}));
+//	esl::logging::Logging::init(*aLogging);
+
 	std::string argument;
 
 	if(argc < 2) {
@@ -34,17 +68,19 @@ int main(int argc, const char *argv[]) {
 	}
 
 	if(argument == "logging-example01") {
-		esl::examples::logging::example01();
+		logbook4esl::Example01::run();
 	}
 	else if(argument == "logging-example02") {
-		esl::examples::logging::example02();
+		logbook4esl::Example02::run();
 	}
 	else if(argument == "logging-example03") {
-		esl::examples::logging::example03();
+		logbook4esl::Example03::run();
 	}
 	else if(argument == "logging-example04") {
-		esl::examples::loggerInitialize();
-		esl::examples::logging::example04();
+		logbook4esl::Example04::run();
+	}
+	else if(argument == "logging-example05") {
+		logbook4esl::Example05::run();
 	}
 	else {
 		std::cout << "unknown argument \"" << argument << "\".\n\n";

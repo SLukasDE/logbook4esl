@@ -21,14 +21,15 @@ SOFTWARE.
 */
 
 #include <logbook4esl/logging/Logging.h>
-#include <logbook4esl/logging/Appender.h>
-
+#include <logbook4esl/config/Logger.h>
 
 #include <logbook/Logbook.h>
 #include <logbook/Level.h>
 
 #include <esl/system/Stacktrace.h>
 
+//#include <map>
+#include <sstream>
 #include <stdexcept>
 
 namespace logbook4esl {
@@ -71,17 +72,20 @@ public:
 private:
     std::unique_ptr<logbook::Writer> writer;
 };
+
+//std::map<std::string, std::unique_ptr<esl::logging::Layout>> layouts;
+//std::vector<std::pair<std::string, std::unique_ptr<esl::logging::Appender>>> appenders;
 } /* anonymous namespace */
 
 std::unique_ptr<esl::logging::Logging> Logging::create(const std::vector<std::pair<std::string, std::string>>& settings) {
 	return std::unique_ptr<esl::logging::Logging>(new Logging(settings));
 }
 
-Logging::Logging(const std::vector<std::pair<std::string, std::string>>& settings) {
+Logging::Logging(const std::vector<std::pair<std::string, std::string>>& settings)
+{
     for(const auto& setting : settings) {
         throw esl::system::Stacktrace::add(std::runtime_error("unknown attribute '\"" + setting.first + "\"'."));
     }
-
 }
 
 void Logging::setUnblocked(bool isUnblocked) {
@@ -92,17 +96,6 @@ void Logging::setLevel(esl::logging::Level aLogLevel, const std::string& typeNam
 	logbook::Level logLevel = eslLoggingLevel2logbookLevel(aLogLevel);
 
 	logbook::setLevel(logLevel, typeName);
-}
-
-void* Logging::addAppender(esl::logging::Appender& appender) {
-	return new Appender(appender);
-}
-
-void Logging::removeAppender(void* handle) {
-	if(handle) {
-		Appender* appender = static_cast<Appender*>(handle);
-		delete appender;
-	}
 }
 
 bool Logging::isEnabled(const char* typeName, esl::logging::Level aLevel) {
@@ -122,6 +115,81 @@ std::unique_ptr<esl::logging::OStream> Logging::createOStream(const esl::logging
 
 unsigned int Logging::getThreadNo(std::thread::id threadId) {
 	return logbook::getThreadNo(threadId);
+}
+
+void Logging::flush(std::ostream* oStream) {
+	for(auto& appender : appenders) {
+		if(oStream) {
+			std::stringstream strStream;
+
+			appender.second->flush(&strStream);
+			if(!strStream.str().empty()) {
+				(*oStream) << "\n\nFlush log messages from appender \"" << appender.first << "\":\n";
+				(*oStream) << strStream.str();
+			}
+		}
+		else {
+			appender.second->flush(nullptr);
+		}
+	}
+}
+/*
+void Logging::flush(esl::logging::StreamReal& streamReal) {
+	for(auto& appender : appenders) {
+		std::stringstream strStream;
+
+		appender.second->flush();
+
+		appender.second->flush(strStream);
+		if(!strStream.str().empty()) {
+			streamReal << "\n\nFlush log messages from appender \"" << appender.first << "\":\n";
+			streamReal << strStream.str();
+		}
+	}
+}
+*/
+
+/*
+void Logger::flush() {
+	for(auto& appender : appenders) {
+		std::stringstream strStream;
+
+		appender.second->flush();
+
+		appender.second->flush(strStream);
+		if(!strStream.str().empty()) {
+			std::cerr << "\n\nFlush log messages from appender \"" << appender.first << "\":\n";
+			std::cerr << strStream.str();
+		}
+	}
+}
+*/
+
+void Logging::addData(const std::string& configuration) {
+	config::Logger loggerConfig(configuration);
+	loggerConfig.install(*this);
+}
+
+void Logging::addFile(const boost::filesystem::path& filename) {
+	config::Logger loggerConfig(filename);
+	loggerConfig.install(*this);
+}
+
+void Logging::addLayout(const std::string& id, std::unique_ptr<esl::logging::Layout> layout) {
+	if(layouts.insert(std::make_pair(id, std::move(layout))).second == false) {
+		throw std::runtime_error("Cannot add layout with id \"" + id + "\" because it exists already");
+	}
+}
+
+void Logging::addAppender(const std::string& name, const std::string& layoutRefId, std::unique_ptr<esl::logging::Appender> appender) {
+	auto iter = layouts.find(layoutRefId);
+	if(iter == std::end(layouts)) {
+		throw std::runtime_error("Appender is referencing an undefined layout \"" + layoutRefId + "\"");
+	}
+
+	appender->setLayout(iter->second.get());
+
+    appenders.push_back(std::make_pair(name, std::unique_ptr<Appender>(new Appender(std::move(appender)))));
 }
 
 

@@ -1,0 +1,27 @@
+<esl-logger>
+	<layout id="standard" implementation="eslx/logging/DefaultLayout">
+		<parameter key="show-timestamp" value="true"/>
+		<parameter key="show-level" value="true"/>
+		<parameter key="show-type-name" value="true"/>
+		<parameter key="show-address" value="false"/>
+		<parameter key="show-file" value="false"/>
+		<parameter key="show-function" value="false"/>
+		<parameter key="show-line-no" value="false"/>
+		<parameter key="show-thread-no" value="false"/>
+	</layout>
+		
+	<appender implementation="eslx/logging/OStreamAppender" record="selected" layout="standard">
+		<parameter key="trace" value="out"/>
+		<parameter key="debug" value="out"/>
+		<parameter key="info"  value="out"/>
+		<parameter key="warn"  value="out"/>
+		<parameter key="error" value="out"/>
+	</appender>
+	
+	<appender implementation="eslx/logging/MemBufferAppender" record="all" layout="standard">
+		<parameter key="max-lines" value="100"/>
+	</appender>
+	
+	<setting scope="*"      level="trace"/>
+	<setting scope="esl::*" level="info"/>
+</esl-logger>
