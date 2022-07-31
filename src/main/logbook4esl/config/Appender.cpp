@@ -141,7 +141,7 @@ void Appender::save(std::ostream& oStream, std::size_t spaces) const {
 std::unique_ptr<esl::logging::Appender> Appender::create() const {
 	std::vector<std::pair<std::string, std::string>> eslSettings;
 	for(auto const& setting : parameters) {
-		eslSettings.push_back(std::make_pair(setting.key, setting.value));
+		eslSettings.push_back(std::make_pair(setting.key, evaluate(setting.value, setting.language)));
 	}
 
 	std::unique_ptr<esl::logging::Appender> appender;
@@ -177,7 +177,7 @@ void Appender::parseInnerElement(const tinyxml2::XMLElement& element) {
 	std::string elementName(element.Name());
 
 	if(elementName == "parameter") {
-		parameters.push_back(common4esl::config::Setting(getFileName(), element, false));
+		parameters.push_back(common4esl::config::Setting(getFileName(), element, true));
 	}
 	else {
 		throw common4esl::config::FilePosition::add(*this, "Unknown element name \"" + elementName + "\"");
