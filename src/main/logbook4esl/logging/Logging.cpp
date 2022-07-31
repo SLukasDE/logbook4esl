@@ -28,7 +28,6 @@ SOFTWARE.
 
 #include <esl/system/Stacktrace.h>
 
-//#include <map>
 #include <sstream>
 #include <stdexcept>
 
@@ -58,8 +57,9 @@ logbook::Level eslLoggingLevel2logbookLevel(esl::logging::Level logLevel) {
 
 class OStream : public esl::logging::OStream {
 public:
-	OStream(std::unique_ptr<logbook::Writer> aWriter)
-	: writer(std::move(aWriter))
+	OStream(Logging& aLogging, std::unique_ptr<logbook::Writer> aWriter)
+	: logging(aLogging),
+	  writer(std::move(aWriter))
 	{ }
 
     std::ostream* getOStream() override {
@@ -69,12 +69,15 @@ public:
     	return nullptr;
     }
 
+    void flush() override {
+    	logging.flush(nullptr);
+    }
+
 private:
+    Logging& logging;
     std::unique_ptr<logbook::Writer> writer;
 };
 
-//std::map<std::string, std::unique_ptr<esl::logging::Layout>> layouts;
-//std::vector<std::pair<std::string, std::unique_ptr<esl::logging::Appender>>> appenders;
 } /* anonymous namespace */
 
 std::unique_ptr<esl::logging::Logging> Logging::create(const std::vector<std::pair<std::string, std::string>>& settings) {
@@ -110,7 +113,7 @@ std::unique_ptr<esl::logging::OStream> Logging::createOStream(const esl::logging
 
 	std::unique_ptr<logbook::Writer> writer = logbook::createWriter(location);
 
-	return std::unique_ptr<esl::logging::OStream>(new OStream(std::move(writer)));
+	return std::unique_ptr<esl::logging::OStream>(new OStream(*this, std::move(writer)));
 }
 
 unsigned int Logging::getThreadNo(std::thread::id threadId) {
@@ -133,37 +136,6 @@ void Logging::flush(std::ostream* oStream) {
 		}
 	}
 }
-/*
-void Logging::flush(esl::logging::StreamReal& streamReal) {
-	for(auto& appender : appenders) {
-		std::stringstream strStream;
-
-		appender.second->flush();
-
-		appender.second->flush(strStream);
-		if(!strStream.str().empty()) {
-			streamReal << "\n\nFlush log messages from appender \"" << appender.first << "\":\n";
-			streamReal << strStream.str();
-		}
-	}
-}
-*/
-
-/*
-void Logger::flush() {
-	for(auto& appender : appenders) {
-		std::stringstream strStream;
-
-		appender.second->flush();
-
-		appender.second->flush(strStream);
-		if(!strStream.str().empty()) {
-			std::cerr << "\n\nFlush log messages from appender \"" << appender.first << "\":\n";
-			std::cerr << strStream.str();
-		}
-	}
-}
-*/
 
 void Logging::addData(const std::string& configuration) {
 	config::Logger loggerConfig(configuration);
