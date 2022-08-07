@@ -91,6 +91,14 @@ Logging::Logging(const std::vector<std::pair<std::string, std::string>>& setting
     }
 }
 
+Logging::~Logging() {
+	// Never call a  virtual method from destructor!
+	// So, we don't call virtual method flush(...), but the real implementation Logging::flush(...) instead.
+	Logging::flush(nullptr);
+	appenders.clear();
+	layouts.clear();
+}
+
 void Logging::setUnblocked(bool isUnblocked) {
 	logbook::setUnblocked(isUnblocked);
 }

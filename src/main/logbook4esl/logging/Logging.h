@@ -50,6 +50,7 @@ public:
 	static std::unique_ptr<esl::logging::Logging> create(const std::vector<std::pair<std::string, std::string>>& settings);
 
 	Logging(const std::vector<std::pair<std::string, std::string>>& settings);
+	~Logging();
 
 	// NOT thread save - call it at the beginning if needed. Default is already "true"
 	// unblocked behavior makes other threads not waiting on logging, while current thread is writing to logger already.
