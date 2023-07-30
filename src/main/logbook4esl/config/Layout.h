@@ -14,6 +14,7 @@
 #include <vector>
 
 namespace logbook4esl {
+inline namespace v1_6 {
 namespace config {
 
 class Layout : public common4esl::config::Config {
@@ -34,6 +35,7 @@ private:
 };
 
 } /* namespace config */
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */
 
 #endif /* LOGBOOK4ESL_CONFIG_LAYOUT_H_ */

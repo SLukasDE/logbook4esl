@@ -1,6 +1,6 @@
 /*
 MIT License
-Copyright (c) 2019-2022 Sven Lukas
+Copyright (c) 2019-2023 Sven Lukas
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ SOFTWARE.
 #include <esl/logging/Logging.h>
 
 namespace logbook4esl {
+inline namespace v1_6 {
 namespace logging {
 
 namespace {
@@ -78,4 +79,5 @@ void Appender::write(const logbook::Location& location, const char* ptr, std::si
 }
 
 } /* namespace logging */
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */

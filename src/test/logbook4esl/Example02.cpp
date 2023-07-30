@@ -10,8 +10,8 @@
 #include <esl/logging/Layout.h>
 #include <esl/logging/Logging.h>
 
-
 namespace logbook4esl {
+inline namespace v1_6 {
 
 namespace {
 /* creating a logger class */
@@ -54,4 +54,5 @@ void Example02::run() {
 	/* the output might be much more specific as you expected. The details depend on your appender you are using and how you initialized it */
 }
 
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */

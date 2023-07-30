@@ -11,6 +11,7 @@
 #include <esl/logging/Logging.h>
 
 namespace logbook4esl {
+inline namespace v1_6 {
 
 namespace {
 /* creating a logger class */
@@ -85,4 +86,5 @@ float Example03::divide(float a, float b) {
 	return 0;
 }
 
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */

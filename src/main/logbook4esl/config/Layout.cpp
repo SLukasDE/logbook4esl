@@ -6,6 +6,7 @@
 #include <utility>
 
 namespace logbook4esl {
+inline namespace v1_6 {
 namespace config {
 
 Layout::Layout(const std::string& fileName, const tinyxml2::XMLElement& element)
@@ -95,4 +96,5 @@ void Layout::parseInnerElement(const tinyxml2::XMLElement& element) {
 }
 
 } /* namespace config */
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */

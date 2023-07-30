@@ -7,6 +7,7 @@
 #include <esl/logging/Logging.h>
 
 namespace logbook4esl {
+inline namespace v1_6 {
 namespace config {
 
 Logger::Logger(const std::string& configuration)
@@ -164,4 +165,5 @@ void Logger::parseInnerElement(const tinyxml2::XMLElement& element) {
 }
 
 } /* namespace config */
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */

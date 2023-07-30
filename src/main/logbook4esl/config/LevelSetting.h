@@ -11,6 +11,7 @@
 #include <ostream>
 
 namespace logbook4esl {
+inline namespace v1_6 {
 namespace config {
 
 class LevelSetting : public common4esl::config::Config {
@@ -28,6 +29,7 @@ private:
 };
 
 } /* namespace config */
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */
 
 #endif /* LOGBOOK4ESL_CONFIG_LEVELSETTING_H_ */

@@ -2,6 +2,7 @@
 #define LOGBOOK4ESL_EXAMPLE04_H_
 
 namespace logbook4esl {
+inline namespace v1_6 {
 
 struct Example04 final {
 	//Example04() = delete;
@@ -13,6 +14,7 @@ private:
 	static void loggerReplay();
 };
 
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */
 
 #endif /* LOGBOOK4ESL_EXAMPLE04_H_ */

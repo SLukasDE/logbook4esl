@@ -2,6 +2,7 @@
 #include "logbook4esl/Logger.h"
 
 namespace logbook4esl {
+inline namespace v1_6 {
 
 namespace {
 /* creating a logger class */
@@ -17,4 +18,5 @@ void Example01::run() {
 	 * Let's go to logger example 2 to see how to initialize... */
 }
 
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */

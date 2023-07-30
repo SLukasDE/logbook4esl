@@ -10,6 +10,7 @@
 #include <utility>
 
 namespace logbook4esl {
+inline namespace v1_6 {
 namespace config {
 
 Appender::Appender(const std::string& fileName, const tinyxml2::XMLElement& element)
@@ -186,3 +187,4 @@ void Appender::parseInnerElement(const tinyxml2::XMLElement& element) {
 
 } /* namespace config */
 } /* namespace common4esl */
+} /* namespace logbook4esl */

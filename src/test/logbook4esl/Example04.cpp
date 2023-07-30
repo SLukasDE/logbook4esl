@@ -15,6 +15,7 @@
 #include <sstream>
 
 namespace logbook4esl {
+inline namespace v1_6 {
 
 namespace {
 /* creating a logger class */
@@ -89,5 +90,5 @@ void Example04::loggerReplay() {
 	std::cout << "Replay: " << sstream.str() << "\n";
 }
 
-
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */

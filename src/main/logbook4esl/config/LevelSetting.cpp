@@ -5,6 +5,7 @@
 #include <esl/utility/String.h>
 
 namespace logbook4esl {
+inline namespace v1_6 {
 namespace config {
 
 LevelSetting::LevelSetting(const std::string& fileName, const tinyxml2::XMLElement& element)
@@ -101,4 +102,5 @@ void LevelSetting::save(std::ostream& oStream, std::size_t spaces) const {
 }
 
 } /* namespace config */
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */

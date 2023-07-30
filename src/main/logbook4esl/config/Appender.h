@@ -14,6 +14,7 @@
 #include <vector>
 
 namespace logbook4esl {
+inline namespace v1_6 {
 namespace config {
 
 class Appender : public common4esl::config::Config {
@@ -38,6 +39,7 @@ private:
 };
 
 } /* namespace config */
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */
 
 #endif /* LOGBOOK4ESL_CONFIG_APPENDER_H_ */

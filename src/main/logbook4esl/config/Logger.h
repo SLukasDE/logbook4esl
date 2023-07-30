@@ -18,6 +18,7 @@
 #include <vector>
 
 namespace logbook4esl {
+inline namespace v1_6 {
 namespace config {
 
 class Logger : public common4esl::config::Config {
@@ -40,6 +41,7 @@ private:
 };
 
 } /* namespace config */
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */
 
 #endif /* LOGBOOK4ESL_CONFIG_LOGGER_H_ */

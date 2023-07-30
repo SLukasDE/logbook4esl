@@ -1,6 +1,6 @@
 /*
 MIT License
-Copyright (c) 2019-2022 Sven Lukas
+Copyright (c) 2019-2023 Sven Lukas
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,7 @@ SOFTWARE.
 #include <vector>
 
 namespace logbook4esl {
+inline namespace v1_6 {
 namespace logging {
 
 class Logging : public esl::logging::Logging {
@@ -84,6 +85,7 @@ private:
 };
 
 } /* namespace logging */
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */
 
 #endif /* LOGBOOK4ESL_LOGGING_LOGGING_H_ */
