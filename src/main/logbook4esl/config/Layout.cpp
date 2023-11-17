@@ -1,4 +1,5 @@
 #include <logbook4esl/config/Layout.h>
+
 #include <common4esl/config/FilePosition.h>
 
 #include <esl/plugin/Registry.h>
@@ -70,14 +71,14 @@ void Layout::save(std::ostream& oStream, std::size_t spaces) const {
 	oStream << makeSpaces(spaces) << "</layout>\n";
 }
 
-std::unique_ptr<esl::logging::Layout> Layout::create() const {
+std::unique_ptr<esl::monitoring::Layout> Layout::create() const {
 	std::vector<std::pair<std::string, std::string>> eslSettings;
 
 	for(auto const& setting : parameters) {
 		eslSettings.push_back(std::make_pair(setting.key, setting.value));
 	}
 
-	return esl::plugin::Registry::get().create<esl::logging::Layout>(implementation, eslSettings);
+	return esl::plugin::Registry::get().create<esl::monitoring::Layout>(implementation, eslSettings);
 }
 
 void Layout::parseInnerElement(const tinyxml2::XMLElement& element) {

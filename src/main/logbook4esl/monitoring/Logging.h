@@ -20,18 +20,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LOGBOOK4ESL_LOGGING_LOGGING_H_
-#define LOGBOOK4ESL_LOGGING_LOGGING_H_
+#ifndef LOGBOOK4ESL_MONITORING_MONITORING_H_
+#define LOGBOOK4ESL_MONITORING_MONITORING_H_
 
-#include <logbook4esl/logging/Appender.h>
+#include <logbook4esl/monitoring/Appender.h>
 
-#include <esl/logging/Appender.h>
-#include <esl/logging/Layout.h>
-#include <esl/logging/Level.h>
-#include <esl/logging/Location.h>
-#include <esl/logging/Logging.h>
-#include <esl/logging/OStream.h>
-#include <esl/logging/StreamReal.h>
+#include <esl/monitoring/Logging.h>
+#include <esl/monitoring/LogbookLogging.h>
+
+#include <esl/monitoring/Appender.h>
+#include <esl/monitoring/Layout.h>
+#include <esl/monitoring/OStream.h>
+#include <esl/monitoring/Streams.h>
 
 #include <boost/filesystem/path.hpp>
 
@@ -44,13 +44,11 @@ SOFTWARE.
 
 namespace logbook4esl {
 inline namespace v1_6 {
-namespace logging {
+namespace monitoring {
 
-class Logging : public esl::logging::Logging {
+class Logging : public esl::monitoring::Logging {
 public:
-	static std::unique_ptr<esl::logging::Logging> create(const std::vector<std::pair<std::string, std::string>>& settings);
-
-	Logging(const std::vector<std::pair<std::string, std::string>>& settings);
+	Logging(const esl::monitoring::LogbookLogging::Settings& settings);
 	~Logging();
 
 	// NOT thread save - call it at the beginning if needed. Default is already "true"
@@ -62,10 +60,10 @@ public:
 	void setUnblocked(bool isUnblocked) override;
 
 	// thread safe, quaranteed by configMutex
-	void setLevel(esl::logging::Level logLevel, const std::string& typeName) override;
+	void setLevel(esl::monitoring::Streams::Level logLevel, const std::string& typeName) override;
 
-	bool isEnabled(const char* typeName, esl::logging::Level level) override;
-	std::unique_ptr<esl::logging::OStream> createOStream(const esl::logging::Location& location) override;
+	bool isEnabled(const char* typeName, esl::monitoring::Streams::Level level) override;
+	std::unique_ptr<esl::monitoring::OStream> createOStream(const esl::monitoring::Streams::Location& location) override;
 	unsigned int getThreadNo(std::thread::id threadId) override;
 
 	void flush(std::ostream* oStream) override;
@@ -73,19 +71,18 @@ public:
 	void addData(const std::string& configuration) override;
 	void addFile(const boost::filesystem::path& filename) override;
 
-	void addLayout(const std::string& id, std::unique_ptr<esl::logging::Layout> layout) override;
+	void addLayout(const std::string& id, std::unique_ptr<esl::monitoring::Layout> layout) override;
 
 	// thread safe, quaranteed by loggerMutex
-	void addAppender(const std::string& name, const std::string& layoutRefId, std::unique_ptr<esl::logging::Appender> appender) override;
+	void addAppender(const std::string& name, const std::string& layoutRefId, std::unique_ptr<esl::monitoring::Appender> appender) override;
 
 private:
-	std::map<std::string, std::unique_ptr<esl::logging::Layout>> layouts;
+	std::map<std::string, std::unique_ptr<esl::monitoring::Layout>> layouts;
 	std::vector<std::pair<std::string, std::unique_ptr<Appender>>> appenders;
-	//std::vector<std::pair<std::string, std::unique_ptr<esl::logging::Appender>>> appenders;
 };
 
-} /* namespace logging */
+} /* namespace monitoring */
 } /* inline namespace v1_6 */
 } /* namespace logbook4esl */
 
-#endif /* LOGBOOK4ESL_LOGGING_LOGGING_H_ */
+#endif /* LOGBOOK4ESL_MONITORING_MONITORING_H_ */

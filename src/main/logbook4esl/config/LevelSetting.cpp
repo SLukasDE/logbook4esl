@@ -34,22 +34,22 @@ LevelSetting::LevelSetting(const std::string& fileName, const tinyxml2::XMLEleme
 			std::string levelStr = esl::utility::String::toUpper(attribute->Value());
 
 			if(levelStr == "SILENT") {
-				level = esl::logging::Level::SILENT;
+				level = esl::monitoring::Streams::Level::SILENT;
 			}
 			else if(levelStr == "ERROR") {
-				level = esl::logging::Level::ERROR;
+				level = esl::monitoring::Streams::Level::ERROR;
 			}
 			else if(levelStr == "WARN") {
-				level = esl::logging::Level::WARN;
+				level = esl::monitoring::Streams::Level::WARN;
 			}
 			else if(levelStr == "INFO") {
-				level = esl::logging::Level::INFO;
+				level = esl::monitoring::Streams::Level::INFO;
 			}
 			else if(levelStr == "DEBUG") {
-				level = esl::logging::Level::DEBUG;
+				level = esl::monitoring::Streams::Level::DEBUG;
 			}
 			else if(levelStr == "TRACE") {
-				level = esl::logging::Level::TRACE;
+				level = esl::monitoring::Streams::Level::TRACE;
 			}
 			else {
 				throw common4esl::config::FilePosition::add(*this, "Value \"" + levelStr + "\" of attribute 'level' is invalid. "
@@ -70,7 +70,7 @@ LevelSetting::LevelSetting(const std::string& fileName, const tinyxml2::XMLEleme
 	}
 }
 
-esl::logging::Level LevelSetting::getLevel() const {
+esl::monitoring::Streams::Level LevelSetting::getLevel() const {
 	return level;
 }
 
@@ -80,22 +80,22 @@ const std::string& LevelSetting::getScope() const {
 
 void LevelSetting::save(std::ostream& oStream, std::size_t spaces) const {
 	switch(level) {
-	case esl::logging::Level::SILENT:
+	case esl::monitoring::Streams::Level::SILENT:
 		oStream << makeSpaces(spaces) << "<setting scope=\"" << scope << "\" level=\"silent\"/>\n";
 		break;
-	case esl::logging::Level::ERROR:
+	case esl::monitoring::Streams::Level::ERROR:
 		oStream << makeSpaces(spaces) << "<setting scope=\"" << scope << "\" level=\"error\"/>\n";
 		break;
-	case esl::logging::Level::WARN:
+	case esl::monitoring::Streams::Level::WARN:
 		oStream << makeSpaces(spaces) << "<setting scope=\"" << scope << "\" level=\"warn\"/>\n";
 		break;
-	case esl::logging::Level::INFO:
+	case esl::monitoring::Streams::Level::INFO:
 		oStream << makeSpaces(spaces) << "<setting scope=\"" << scope << "\" level=\"info\"/>\n";
 		break;
-	case esl::logging::Level::DEBUG:
+	case esl::monitoring::Streams::Level::DEBUG:
 		oStream << makeSpaces(spaces) << "<setting scope=\"" << scope << "\" level=\"debug\"/>\n";
 		break;
-	case esl::logging::Level::TRACE:
+	case esl::monitoring::Streams::Level::TRACE:
 		oStream << makeSpaces(spaces) << "<setting scope=\"" << scope << "\" level=\"trace\"/>\n";
 		break;
 	}

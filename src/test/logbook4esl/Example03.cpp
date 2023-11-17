@@ -1,14 +1,14 @@
 #include "logbook4esl/Example03.h"
 #include "logbook4esl/Logger.h"
 
-#include <logbook4esl/logging/Logging.h>
+#include <logbook4esl/monitoring/Logging.h>
 
-#include <common4esl/logging/DefaultLayout.h>
-#include <common4esl/logging/OStreamAppender.h>
+#include <common4esl/monitoring/DefaultLayout.h>
+#include <common4esl/monitoring/OStreamAppender.h>
 
-#include <esl/logging/Appender.h>
-#include <esl/logging/Layout.h>
-#include <esl/logging/Logging.h>
+#include <esl/monitoring/Appender.h>
+#include <esl/monitoring/Layout.h>
+#include <esl/monitoring/Logging.h>
 
 namespace logbook4esl {
 inline namespace v1_6 {
@@ -19,13 +19,13 @@ Logger logger("logbook4esl::Example03");
 }
 
 void Example03::run() {
-	std::unique_ptr<esl::logging::Logging> aLogging(new logbook4esl::logging::Logging({}));
-	esl::logging::Logging::init(std::move(aLogging));
+	std::unique_ptr<esl::monitoring::Logging> aLogging(new logbook4esl::monitoring::Logging({}));
+	esl::monitoring::Logging::init(std::move(aLogging));
 
 	{
 		/* each appender has a layout to specify which columns we want to see.
 		 * Let's play a little bit with this feature ... */
-		std::unique_ptr<esl::logging::Layout> defaultLayout(new common4esl::logging::DefaultLayout({
+		std::unique_ptr<esl::monitoring::Layout> defaultLayout(new common4esl::monitoring::DefaultLayout({
 			{"show-timestamp", "true"},
 			{"show-level", "true"},
 			{"show-type-name", "true"},
@@ -35,18 +35,18 @@ void Example03::run() {
 			{"show-line-no", "true"},
 			{"show-thread-no", "true"}
 		}));
-		esl::logging::Logging::get()->addLayout("defaultLayout", std::move(defaultLayout));
+		esl::monitoring::Logging::get()->addLayout("defaultLayout", std::move(defaultLayout));
 	}
 
 	{
-		std::unique_ptr<esl::logging::Appender> oStreamAppender(new common4esl::logging::OStreamAppender({
+		std::unique_ptr<esl::monitoring::Appender> oStreamAppender(new common4esl::monitoring::OStreamAppender({
 			{"trace", "out"},
 			{"debug", "out"},
 			{"info", "out"},
 			{"warn", "out"},
 			{"error", "out"}
 		}));
-		esl::logging::Logging::get()->addAppender("", "defaultLayout", std::move(oStreamAppender));
+		esl::monitoring::Logging::get()->addAppender("", "defaultLayout", std::move(oStreamAppender));
 	}
 
 	/* Let's do some more initialization...
@@ -62,8 +62,8 @@ void Example03::run() {
 	 * It is possible to specify for each path and it's sub paths a different log level.
 	 * Here we want to make all log messages silent but for class Example03 we want to get all log messages up to "WARN"-level.
 	 */
-	esl::logging::Logging::get()->setLevel(esl::logging::Level::SILENT, "*");
-	esl::logging::Logging::get()->setLevel(esl::logging::Level::WARN, "logbook4esl::Example03");
+	esl::monitoring::Logging::get()->setLevel(esl::monitoring::Level::SILENT, "*");
+	esl::monitoring::Logging::get()->setLevel(esl::monitoring::Level::WARN, "logbook4esl::Example03");
 
 	Example03 e;
 	e.divide(5, 5);

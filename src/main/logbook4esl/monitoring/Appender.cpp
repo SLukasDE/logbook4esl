@@ -20,44 +20,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <logbook4esl/logging/Appender.h>
+#include <logbook4esl/monitoring/Appender.h>
 
-#include <esl/logging/Location.h>
-#include <esl/logging/Logging.h>
+#include <esl/monitoring/Streams.h>
+#include <esl/monitoring/Logging.h>
 
 namespace logbook4esl {
 inline namespace v1_6 {
-namespace logging {
+namespace monitoring {
 
 namespace {
-esl::logging::Level logbookLevel2eslLoggingLevel(logbook::Level logLevel) {
+esl::monitoring::Streams::Level logbookLevel2eslLoggingLevel(logbook::Level logLevel) {
 	switch(logLevel) {
 	case logbook::Level::TRACE:
-		return esl::logging::Level::TRACE;
+		return esl::monitoring::Streams::Level::TRACE;
 	case logbook::Level::DEBUG:
-		return esl::logging::Level::DEBUG;
+		return esl::monitoring::Streams::Level::DEBUG;
 	case logbook::Level::INFO:
-		return esl::logging::Level::INFO;
+		return esl::monitoring::Streams::Level::INFO;
 	case logbook::Level::WARN:
-		return esl::logging::Level::WARN;
+		return esl::monitoring::Streams::Level::WARN;
 	case logbook::Level::ERROR:
-		return esl::logging::Level::ERROR;
+		return esl::monitoring::Streams::Level::ERROR;
 	case logbook::Level::SILENT:
-		return esl::logging::Level::SILENT;
+		return esl::monitoring::Streams::Level::SILENT;
 	default:
 		break;
 	}
-	throw std::runtime_error("conversion error from logbook::Level to esl::logging::Level");
+	throw std::runtime_error("conversion error from logbook::Level to esl::monitoring::Level");
 }
 
-esl::logging::Location logbookLocation2eslLoggingLocation(const logbook::Location& location) {
-	esl::logging::Location eslLocation(logbookLevel2eslLoggingLevel(location.level), location.object, location.typeName, location.function, location.file, location.line, location.threadId);
+esl::monitoring::Streams::Location logbookLocation2eslLoggingLocation(const logbook::Location& location) {
+	esl::monitoring::Streams::Location eslLocation(logbookLevel2eslLoggingLevel(location.level), location.object, location.typeName, location.function, location.file, location.line, location.threadId);
 	eslLocation.enabled = location.enabled;
 	return eslLocation;
 }
 }
 
-Appender::Appender(std::unique_ptr<esl::logging::Appender> aEslAppender)
+Appender::Appender(std::unique_ptr<esl::monitoring::Appender> aEslAppender)
 : logbook::Appender(),
   eslAppender(std::move(aEslAppender))
 { }
@@ -78,6 +78,6 @@ void Appender::write(const logbook::Location& location, const char* ptr, std::si
 	}
 }
 
-} /* namespace logging */
+} /* namespace monitoring */
 } /* inline namespace v1_6 */
 } /* namespace logbook4esl */

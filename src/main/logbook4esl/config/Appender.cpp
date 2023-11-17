@@ -1,9 +1,11 @@
 #include <logbook4esl/config/Appender.h>
+
 #include <common4esl/config/FilePosition.h>
+
+#include <esl/utility/String.h>
 
 #include <esl/plugin/exception/PluginNotFound.h>
 #include <esl/plugin/Registry.h>
-#include <esl/utility/String.h>
 
 #include <iostream>
 #include <stdexcept>
@@ -39,13 +41,13 @@ Appender::Appender(const std::string& fileName, const tinyxml2::XMLElement& elem
 			std::string recordLevelStr = esl::utility::String::toUpper(attribute->Value());
 
 			if(recordLevelStr == "ALL") {
-				recordLevel = esl::logging::Appender::RecordLevel::ALL;
+				recordLevel = esl::monitoring::Appender::RecordLevel::ALL;
 			}
 			else if(recordLevelStr == "SELECTED") {
-				recordLevel = esl::logging::Appender::RecordLevel::SELECTED;
+				recordLevel = esl::monitoring::Appender::RecordLevel::SELECTED;
 			}
 			else if(recordLevelStr == "OFF") {
-				recordLevel = esl::logging::Appender::RecordLevel::OFF;
+				recordLevel = esl::monitoring::Appender::RecordLevel::OFF;
 			}
 			else {
 				throw common4esl::config::FilePosition::add(*this, "Value \"" + std::string(attribute->Value()) + "\" of attribute 'record' is invalid. "
@@ -114,13 +116,13 @@ void Appender::save(std::ostream& oStream, std::size_t spaces) const {
 	}
 
 	switch(recordLevel) {
-	case esl::logging::Appender::RecordLevel::ALL:
+	case esl::monitoring::Appender::RecordLevel::ALL:
 		oStream << " record=\"ALL\"";
 		break;
-	case esl::logging::Appender::RecordLevel::SELECTED:
+	case esl::monitoring::Appender::RecordLevel::SELECTED:
 		oStream << " record=\"SELECTED\"";
 		break;
-	case esl::logging::Appender::RecordLevel::OFF:
+	case esl::monitoring::Appender::RecordLevel::OFF:
 		oStream << " record=\"OFF\"";
 		break;
 	}
@@ -139,15 +141,15 @@ void Appender::save(std::ostream& oStream, std::size_t spaces) const {
 	}
 }
 
-std::unique_ptr<esl::logging::Appender> Appender::create() const {
+std::unique_ptr<esl::monitoring::Appender> Appender::create() const {
 	std::vector<std::pair<std::string, std::string>> eslSettings;
 	for(auto const& setting : parameters) {
 		eslSettings.push_back(std::make_pair(setting.key, evaluate(setting.value, setting.language)));
 	}
 
-	std::unique_ptr<esl::logging::Appender> appender;
+	std::unique_ptr<esl::monitoring::Appender> appender;
 	try {
-		appender = esl::plugin::Registry::get().create<esl::logging::Appender>(implementation, eslSettings);
+		appender = esl::plugin::Registry::get().create<esl::monitoring::Appender>(implementation, eslSettings);
 	}
 	catch(const esl::plugin::exception::PluginNotFound& e) {
 		throw common4esl::config::FilePosition::add(*this, e);
@@ -186,5 +188,5 @@ void Appender::parseInnerElement(const tinyxml2::XMLElement& element) {
 }
 
 } /* namespace config */
-} /* namespace common4esl */
+} /* inline namespace v1_6 */
 } /* namespace logbook4esl */

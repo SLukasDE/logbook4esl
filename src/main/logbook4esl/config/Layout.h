@@ -4,7 +4,7 @@
 #include <common4esl/config/Config.h>
 #include <common4esl/config/Setting.h>
 
-#include <esl/logging/Layout.h>
+#include <esl/monitoring/Layout.h>
 
 #include <tinyxml2/tinyxml2.h>
 
@@ -24,7 +24,7 @@ public:
 	const std::string& getId() const noexcept;
 
 	void save(std::ostream& oStream, std::size_t spaces) const;
-	std::unique_ptr<esl::logging::Layout> create() const;
+	std::unique_ptr<esl::monitoring::Layout> create() const;
 
 private:
 	std::string id;

@@ -4,7 +4,7 @@
 #include <logbook4esl/config/Appender.h>
 #include <logbook4esl/config/Layout.h>
 #include <logbook4esl/config/LevelSetting.h>
-#include <logbook4esl/logging/Logging.h>
+#include <logbook4esl/monitoring/Logging.h>
 
 #include <common4esl/config/Config.h>
 
@@ -28,7 +28,7 @@ public:
 	Logger(const std::string& filename, const tinyxml2::XMLElement& element);
 
 	void save(std::ostream& oStream) const;
-	void install(logging::Logging& aLogging) const;
+	void install(monitoring::Logging& aLogging) const;
 
 private:
 	std::map<std::string, Layout> layouts;

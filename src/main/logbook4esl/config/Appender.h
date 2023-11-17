@@ -4,7 +4,7 @@
 #include <common4esl/config/Config.h>
 #include <common4esl/config/Setting.h>
 
-#include <esl/logging/Appender.h>
+#include <esl/monitoring/Appender.h>
 
 #include <tinyxml2/tinyxml2.h>
 
@@ -26,11 +26,11 @@ public:
 
 	void save(std::ostream& oStream, std::size_t spaces) const;
 
-	std::unique_ptr<esl::logging::Appender> create() const;
+	std::unique_ptr<esl::monitoring::Appender> create() const;
 
 private:
 	std::string name;
-	esl::logging::Appender::RecordLevel recordLevel = esl::logging::Appender::RecordLevel::SELECTED;
+	esl::monitoring::Appender::RecordLevel recordLevel = esl::monitoring::Appender::RecordLevel::SELECTED;
 	std::string layoutId;
 	std::string implementation;
 	std::vector<common4esl::config::Setting> parameters;

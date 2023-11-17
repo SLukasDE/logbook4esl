@@ -1,14 +1,14 @@
 #include "logbook4esl/Example02.h"
 #include "logbook4esl/Logger.h"
 
-#include <logbook4esl/logging/Logging.h>
+#include <logbook4esl/monitoring/Logging.h>
 
-#include <common4esl/logging/DefaultLayout.h>
-#include <common4esl/logging/OStreamAppender.h>
+#include <common4esl/monitoring/DefaultLayout.h>
+#include <common4esl/monitoring/OStreamAppender.h>
 
-#include <esl/logging/Appender.h>
-#include <esl/logging/Layout.h>
-#include <esl/logging/Logging.h>
+#include <esl/monitoring/Appender.h>
+#include <esl/monitoring/Layout.h>
+#include <esl/monitoring/Logging.h>
 
 namespace logbook4esl {
 inline namespace v1_6 {
@@ -19,23 +19,23 @@ Logger logger("logbook4esl::Example02");
 }
 
 void Example02::run() {
-	std::unique_ptr<esl::logging::Logging> aLogging(new logbook4esl::logging::Logging({}));
-	esl::logging::Logging::init(std::move(aLogging));
+	std::unique_ptr<esl::monitoring::Logging> aLogging(new logbook4esl::monitoring::Logging({}));
+	esl::monitoring::Logging::init(std::move(aLogging));
 
 	{
-		std::unique_ptr<esl::logging::Layout> defaultLayout(new common4esl::logging::DefaultLayout({}));
-		esl::logging::Logging::get()->addLayout("defaultLayout", std::move(defaultLayout));
+		std::unique_ptr<esl::monitoring::Layout> defaultLayout(new common4esl::monitoring::DefaultLayout({}));
+		esl::monitoring::Logging::get()->addLayout("defaultLayout", std::move(defaultLayout));
 	}
 
 	{
-		std::unique_ptr<esl::logging::Appender> oStreamAppender(new common4esl::logging::OStreamAppender({
+		std::unique_ptr<esl::monitoring::Appender> oStreamAppender(new common4esl::monitoring::OStreamAppender({
 			{"trace", "out"},
 			{"debug", "out"},
 			{"info", "out"},
 			{"warn", "out"},
 			{"error", "out"}
 		}));
-		esl::logging::Logging::get()->addAppender("", "defaultLayout", std::move(oStreamAppender));
+		esl::monitoring::Logging::get()->addAppender("", "defaultLayout", std::move(oStreamAppender));
 	}
 
 

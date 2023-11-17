@@ -3,7 +3,7 @@
 
 #include <common4esl/config/Config.h>
 
-#include <esl/logging/Level.h>
+#include <esl/monitoring/Streams.h>
 
 #include <tinyxml2/tinyxml2.h>
 
@@ -18,13 +18,13 @@ class LevelSetting : public common4esl::config::Config {
 public:
 	LevelSetting(const std::string& fileName, const tinyxml2::XMLElement& element);
 
-	esl::logging::Level getLevel() const;
+	esl::monitoring::Streams::Level getLevel() const;
 	const std::string& getScope() const;
 
 	void save(std::ostream& oStream, std::size_t spaces) const;
 
 private:
-	esl::logging::Level level = esl::logging::Level::SILENT;
+	esl::monitoring::Streams::Level level = esl::monitoring::Streams::Level::SILENT;
 	std::string scope;
 };
 

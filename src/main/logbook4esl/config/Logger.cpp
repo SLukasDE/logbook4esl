@@ -1,10 +1,10 @@
 #include <logbook4esl/config/Logger.h>
-#include <logbook4esl/logging/Logging.h>
+#include <logbook4esl/monitoring/Logging.h>
 
 #include <common4esl/config/FilePosition.h>
 
-//#include <esl/logging/Logger.h>
-#include <esl/logging/Logging.h>
+//#include <esl/monitoring/Logger.h>
+#include <esl/monitoring/Logging.h>
 
 namespace logbook4esl {
 inline namespace v1_6 {
@@ -84,7 +84,7 @@ void Logger::save(std::ostream& oStream) const {
 	oStream << "</esl-logger>\n";
 }
 
-void Logger::install(logging::Logging& aLogging) const {
+void Logger::install(monitoring::Logging& aLogging) const {
 	/* *************** *
 	 * Install layouts *
 	 * *************** */

@@ -20,23 +20,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LOGBOOK4ESL_LOGGING_APPENDER_H_
-#define LOGBOOK4ESL_LOGGING_APPENDER_H_
+#ifndef LOGBOOK4ESL_MONITORING_APPENDER_H_
+#define LOGBOOK4ESL_MONITORING_APPENDER_H_
 
 #include <logbook/Appender.h>
 #include <logbook/Location.h>
 
-#include <esl/logging/Appender.h>
+#include <esl/monitoring/Appender.h>
 
 #include <ostream>
 
 namespace logbook4esl {
 inline namespace v1_6 {
-namespace logging {
+namespace monitoring {
 
 class Appender : public logbook::Appender {
 public:
-	Appender(std::unique_ptr<esl::logging::Appender> eslAppender);
+	Appender(std::unique_ptr<esl::monitoring::Appender> eslAppender);
 
 	void flush(std::ostream* oStream);
 
@@ -45,11 +45,11 @@ protected:
 	void write(const logbook::Location& location, const char* ptr, std::size_t size) override;
 
 private:
-	std::unique_ptr<esl::logging::Appender> eslAppender;
+	std::unique_ptr<esl::monitoring::Appender> eslAppender;
 };
 
-} /* namespace logging */
+} /* namespace monitoring */
 } /* inline namespace v1_6 */
 } /* namespace logbook4esl */
 
-#endif /* LOGBOOK4ESL_LOGGING_APPENDER_H_ */
+#endif /* LOGBOOK4ESL_MONITORING_APPENDER_H_ */

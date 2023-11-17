@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <logbook4esl/logging/Logging.h>
+#include <logbook4esl/monitoring/Logging.h>
 #include <logbook4esl/config/Logger.h>
 
 #include <logbook/Logbook.h>
@@ -33,30 +33,30 @@ SOFTWARE.
 
 namespace logbook4esl {
 inline namespace v1_6 {
-namespace logging {
+namespace monitoring {
 
 namespace {
-logbook::Level eslLoggingLevel2logbookLevel(esl::logging::Level logLevel) {
+logbook::Level eslLoggingLevel2logbookLevel(esl::monitoring::Streams::Level logLevel) {
 	switch(logLevel) {
-	case esl::logging::Level::TRACE:
+	case esl::monitoring::Streams::Level::TRACE:
 		return logbook::Level::TRACE;
-	case esl::logging::Level::DEBUG:
+	case esl::monitoring::Streams::Level::DEBUG:
 		return logbook::Level::DEBUG;
-	case esl::logging::Level::INFO:
+	case esl::monitoring::Streams::Level::INFO:
 		return logbook::Level::INFO;
-	case esl::logging::Level::WARN:
+	case esl::monitoring::Streams::Level::WARN:
 		return logbook::Level::WARN;
-	case esl::logging::Level::ERROR:
+	case esl::monitoring::Streams::Level::ERROR:
 		return logbook::Level::ERROR;
-	case esl::logging::Level::SILENT:
+	case esl::monitoring::Streams::Level::SILENT:
 		return logbook::Level::SILENT;
 	default:
 		break;
 	}
-	throw std::runtime_error("conversion error from esl::logging::Level to logbook::Level");
+	throw std::runtime_error("conversion error from esl::monitoring::Level to logbook::Level");
 }
 
-class OStream : public esl::logging::OStream {
+class OStream : public esl::monitoring::OStream {
 public:
 	OStream(Logging& aLogging, std::unique_ptr<logbook::Writer> aWriter)
 	: logging(aLogging),
@@ -81,16 +81,8 @@ private:
 
 } /* anonymous namespace */
 
-std::unique_ptr<esl::logging::Logging> Logging::create(const std::vector<std::pair<std::string, std::string>>& settings) {
-	return std::unique_ptr<esl::logging::Logging>(new Logging(settings));
-}
-
-Logging::Logging(const std::vector<std::pair<std::string, std::string>>& settings)
-{
-    for(const auto& setting : settings) {
-        throw esl::system::Stacktrace::add(std::runtime_error("unknown attribute '\"" + setting.first + "\"'."));
-    }
-}
+Logging::Logging(const esl::monitoring::LogbookLogging::Settings&)
+{ }
 
 Logging::~Logging() {
 	// Never call a  virtual method from destructor!
@@ -104,25 +96,25 @@ void Logging::setUnblocked(bool isUnblocked) {
 	logbook::setUnblocked(isUnblocked);
 }
 
-void Logging::setLevel(esl::logging::Level aLogLevel, const std::string& typeName) {
+void Logging::setLevel(esl::monitoring::Streams::Level aLogLevel, const std::string& typeName) {
 	logbook::Level logLevel = eslLoggingLevel2logbookLevel(aLogLevel);
 
 	logbook::setLevel(logLevel, typeName);
 }
 
-bool Logging::isEnabled(const char* typeName, esl::logging::Level aLevel) {
+bool Logging::isEnabled(const char* typeName, esl::monitoring::Streams::Level aLevel) {
 	logbook::Level level = eslLoggingLevel2logbookLevel(aLevel);
 
 	return logbook::isLoggingEnabled(typeName, level);
 }
 
-std::unique_ptr<esl::logging::OStream> Logging::createOStream(const esl::logging::Location& aLocation) {
+std::unique_ptr<esl::monitoring::OStream> Logging::createOStream(const esl::monitoring::Streams::Location& aLocation) {
 	logbook::Level level = eslLoggingLevel2logbookLevel(aLocation.level);
 	logbook::Location location(level, aLocation.object, aLocation.typeName, aLocation.function, aLocation.file, aLocation.line, aLocation.threadId);
 
 	std::unique_ptr<logbook::Writer> writer = logbook::createWriter(location);
 
-	return std::unique_ptr<esl::logging::OStream>(new OStream(*this, std::move(writer)));
+	return std::unique_ptr<esl::monitoring::OStream>(new OStream(*this, std::move(writer)));
 }
 
 unsigned int Logging::getThreadNo(std::thread::id threadId) {
@@ -156,13 +148,13 @@ void Logging::addFile(const boost::filesystem::path& filename) {
 	loggerConfig.install(*this);
 }
 
-void Logging::addLayout(const std::string& id, std::unique_ptr<esl::logging::Layout> layout) {
+void Logging::addLayout(const std::string& id, std::unique_ptr<esl::monitoring::Layout> layout) {
 	if(layouts.insert(std::make_pair(id, std::move(layout))).second == false) {
 		throw std::runtime_error("Cannot add layout with id \"" + id + "\" because it exists already");
 	}
 }
 
-void Logging::addAppender(const std::string& name, const std::string& layoutRefId, std::unique_ptr<esl::logging::Appender> appender) {
+void Logging::addAppender(const std::string& name, const std::string& layoutRefId, std::unique_ptr<esl::monitoring::Appender> appender) {
 	auto iter = layouts.find(layoutRefId);
 	if(iter == std::end(layouts)) {
 		throw std::runtime_error("Appender is referencing an undefined layout \"" + layoutRefId + "\"");
@@ -174,6 +166,6 @@ void Logging::addAppender(const std::string& name, const std::string& layoutRefI
 }
 
 
-} /* namespace logging */
+} /* namespace monitoring */
 } /* inline namespace v1_6 */
 } /* namespace logbook4esl */
