@@ -16,16 +16,16 @@ LogbookLogging::Settings::Settings(const std::vector<std::pair<std::string, std:
     }
 }
 
-LogbookLogging::LogbookLogging()
-: logging(new logbook4esl::monitoring::Logging(Settings()))
-{ }
-
 LogbookLogging::LogbookLogging(const Settings& settings)
-: LogbookLogging()
+: logging(new logbook4esl::monitoring::Logging(Settings()))
 { }
 
 std::unique_ptr<Logging> LogbookLogging::create(const std::vector<std::pair<std::string, std::string>>& settings) {
 	return std::unique_ptr<Logging>(new LogbookLogging(Settings(settings)));
+}
+
+std::unique_ptr<Logging> LogbookLogging::createNative(const Settings& settings) {
+	return std::unique_ptr<Logging>(new logbook4esl::monitoring::Logging(settings));
 }
 
 void LogbookLogging::setUnblocked(bool isUnblocked) {

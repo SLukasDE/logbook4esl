@@ -26,9 +26,10 @@ public:
 		Settings(const std::vector<std::pair<std::string, std::string>>& settings);
 	};
 
-	LogbookLogging();
+	LogbookLogging(const Settings& settings = Settings());
 
 	static std::unique_ptr<Logging> create(const std::vector<std::pair<std::string, std::string>>& settings);
+	static std::unique_ptr<Logging> createNative(const Settings& settings = Settings());
 
 	void setUnblocked(bool isUnblocked) override;
 
@@ -46,8 +47,6 @@ public:
 	void addAppender(const std::string& name, const std::string& layoutRefId, std::unique_ptr<Appender> appender) override;
 
 private:
-	LogbookLogging(const Settings& settings);
-
 	std::unique_ptr<Logging> logging;
 };
 
