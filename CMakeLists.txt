@@ -14,6 +14,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Packages)
 
 option(COMPILE_UNITTESTS "Weather to compile unittests" ON)
+option(BUILD_SHARED_LIBS "Weather to compile shared libs" ON)
 
 if(NOT ALL_IN_ONE_ESL) # always needed for unittests
     #find_package_TinyXML2()
