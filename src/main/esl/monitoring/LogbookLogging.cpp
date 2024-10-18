@@ -56,7 +56,7 @@ void LogbookLogging::addData(const std::string& configuration) {
 	logging->addData(configuration);
 }
 
-void LogbookLogging::addFile(const boost::filesystem::path& filename) {
+void LogbookLogging::addFile(const std::string& filename) {
 	logging->addFile(filename);
 }
 

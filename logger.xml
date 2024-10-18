@@ -1,8 +1,8 @@
 <esl-logger>
-	<layout id="standard" implementation="eslx/logging/DefaultLayout">
+	<layout id="standard" implementation="esl/monitoring/DefaultLayout">
 		<parameter key="show-timestamp" value="true"/>
 		<parameter key="show-level" value="true"/>
-		<parameter key="show-type-name" value="true"/>
+		<parameter key="show-typename" value="true"/>
 		<parameter key="show-address" value="false"/>
 		<parameter key="show-file" value="false"/>
 		<parameter key="show-function" value="false"/>
@@ -10,7 +10,7 @@
 		<parameter key="show-thread-no" value="false"/>
 	</layout>
 		
-	<appender implementation="eslx/logging/OStreamAppender" record="selected" layout="standard">
+	<appender implementation="esl/monitoring/OStreamAppender" record="selected" layout="standard">
 		<parameter key="trace" value="out"/>
 		<parameter key="debug" value="out"/>
 		<parameter key="info"  value="out"/>
@@ -18,7 +18,7 @@
 		<parameter key="error" value="out"/>
 	</appender>
 	
-	<appender implementation="eslx/logging/MemBufferAppender" record="all" layout="standard">
+	<appender implementation="esl/monitoring/MemBufferAppender" record="all" layout="standard">
 		<parameter key="max-lines" value="100"/>
 	</appender>
 	

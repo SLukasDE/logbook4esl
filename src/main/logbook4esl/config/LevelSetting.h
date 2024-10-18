@@ -5,7 +5,7 @@
 
 #include <esl/monitoring/Streams.h>
 
-#include <tinyxml2/tinyxml2.h>
+#include <tinyxml2.h>
 
 #include <string>
 #include <ostream>
@@ -24,7 +24,7 @@ public:
 	void save(std::ostream& oStream, std::size_t spaces) const;
 
 private:
-	esl::monitoring::Streams::Level level = esl::monitoring::Streams::Level::SILENT;
+	esl::monitoring::Streams::Level level = esl::monitoring::Streams::Level::silent;
 	std::string scope;
 };
 

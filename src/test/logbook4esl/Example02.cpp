@@ -1,14 +1,10 @@
 #include "logbook4esl/Example02.h"
 #include "logbook4esl/Logger.h"
 
-#include <logbook4esl/monitoring/Logging.h>
-
-#include <common4esl/monitoring/DefaultLayout.h>
-#include <common4esl/monitoring/OStreamAppender.h>
-
-#include <esl/monitoring/Appender.h>
-#include <esl/monitoring/Layout.h>
-#include <esl/monitoring/Logging.h>
+#include <esl/monitoring/LogbookLogging.h>
+#include <esl/monitoring/OStreamAppender.h>
+#include <esl/monitoring/SimpleLayout.h>
+#include <esl/plugin/Registry.h>
 
 namespace logbook4esl {
 inline namespace v1_6 {
@@ -19,25 +15,24 @@ Logger logger("logbook4esl::Example02");
 }
 
 void Example02::run() {
-	std::unique_ptr<esl::monitoring::Logging> aLogging(new logbook4esl::monitoring::Logging({}));
-	esl::monitoring::Logging::init(std::move(aLogging));
-
+	esl::plugin::Registry& registry(esl::plugin::Registry::get());
 	{
-		std::unique_ptr<esl::monitoring::Layout> defaultLayout(new common4esl::monitoring::DefaultLayout({}));
-		esl::monitoring::Logging::get()->addLayout("defaultLayout", std::move(defaultLayout));
-	}
+		auto logging = esl::monitoring::LogbookLogging::createNative();
 
-	{
-		std::unique_ptr<esl::monitoring::Appender> oStreamAppender(new common4esl::monitoring::OStreamAppender({
+		auto layout = esl::monitoring::SimpleLayout::create({});
+		logging->addLayout("defaultLayout", std::move(layout));
+
+		auto appender = esl::monitoring::OStreamAppender::create({
 			{"trace", "out"},
 			{"debug", "out"},
 			{"info", "out"},
 			{"warn", "out"},
 			{"error", "out"}
-		}));
-		esl::monitoring::Logging::get()->addAppender("", "defaultLayout", std::move(oStreamAppender));
-	}
+		});
+		logging->addAppender("", "defaultLayout", std::move(appender));
 
+		registry.setObject(std::move(logging));
+	}
 
 
 	/* this function is similar to example01(). But we make a little bit more.

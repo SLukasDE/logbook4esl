@@ -8,9 +8,7 @@
 
 #include <common4esl/config/Config.h>
 
-#include <tinyxml2/tinyxml2.h>
-
-#include <boost/filesystem/path.hpp>
+#include <tinyxml2.h>
 
 #include <map>
 #include <ostream>
@@ -23,8 +21,7 @@ namespace config {
 
 class Logger : public common4esl::config::Config {
 public:
-	explicit Logger(const std::string& configuration);
-	explicit Logger(const boost::filesystem::path& filename);
+	Logger(bool isFile, const std::string& value);
 	Logger(const std::string& filename, const tinyxml2::XMLElement& element);
 
 	void save(std::ostream& oStream) const;

@@ -10,12 +10,14 @@ namespace logbook4esl {
 inline namespace v1_6 {
 namespace config {
 
-Logger::Logger(const std::string& configuration)
-: common4esl::config::Config("{mem}")
+Logger::Logger(bool isFile, const std::string& value)
+: common4esl::config::Config(isFile ? value : "{mem}")
 {
 	tinyxml2::XMLDocument xmlDocument;
 
-	tinyxml2::XMLError xmlError = xmlDocument.Parse(configuration.c_str(), configuration.size());
+	tinyxml2::XMLError xmlError = isFile ?
+			xmlDocument.LoadFile(value.c_str()) :
+			xmlDocument.Parse(value.c_str(), value.size());
 	if(xmlError != tinyxml2::XML_SUCCESS) {
 		throw common4esl::config::FilePosition::add(*this, xmlError);
 	}
@@ -25,26 +27,8 @@ Logger::Logger(const std::string& configuration)
 		throw common4esl::config::FilePosition::add(*this, "No root element");
 	}
 
-	setXMLFile(getFileName(), *element);
-	loadXML(*element);
-}
-
-Logger::Logger(const boost::filesystem::path& filename)
-: common4esl::config::Config(filename.generic_string())
-{
-	tinyxml2::XMLDocument xmlDocument;
-
-	tinyxml2::XMLError xmlError = xmlDocument.LoadFile(filename.generic_string().c_str());
-	if(xmlError != tinyxml2::XML_SUCCESS) {
-		throw common4esl::config::FilePosition::add(*this, xmlError);
-	}
-
-	const tinyxml2::XMLElement* element = xmlDocument.RootElement();
-	if(element == nullptr) {
-		throw common4esl::config::FilePosition::add(*this, "No root element");
-	}
-
-	setXMLFile(filename.generic_string(), *element);
+	//setXMLFile(filename.generic_string(), *element);
+	//setXMLFile(getFileName(), *element);
 	loadXML(*element);
 }
 

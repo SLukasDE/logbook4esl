@@ -3,13 +3,12 @@
 
 #include <logbook4esl/monitoring/Logging.h>
 
-#include <common4esl/monitoring/DefaultLayout.h>
-#include <common4esl/monitoring/OStreamAppender.h>
-#include <common4esl/monitoring/MemBufferAppender.h>
-
-#include <esl/monitoring/Appender.h>
-#include <esl/monitoring/Layout.h>
+#include <esl/monitoring/MemBufferAppender.h>
+#include <esl/monitoring/OStreamAppender.h>
+#include <esl/monitoring/LogbookLogging.h>
 #include <esl/monitoring/Logging.h>
+#include <esl/monitoring/SimpleLayout.h>
+#include <esl/plugin/Registry.h>
 
 #include <iostream>
 #include <sstream>
@@ -23,41 +22,41 @@ Logger logger("logbook4esl::Example04");
 }
 
 void Example04::run() {
-	std::unique_ptr<esl::monitoring::Logging> aLogging(new logbook4esl::monitoring::Logging({}));
-	esl::monitoring::Logging::init(std::move(aLogging));
-
+	esl::plugin::Registry& registry(esl::plugin::Registry::get());
 	{
+		auto logging = esl::monitoring::LogbookLogging::createNative();
+
 		/* each appender has a layout to specify which columns we want to see.
 		 * Let's play a little bit with this feature ... */
-		std::unique_ptr<esl::monitoring::Layout> defaultLayout(new common4esl::monitoring::DefaultLayout({
+		auto layout = esl::monitoring::SimpleLayout::create({
 			{"show-file", "true"},
 			{"show-line-no", "true"}
-		}));
-		esl::monitoring::Logging::get()->addLayout("defaultLayout", std::move(defaultLayout));
-	}
+		});
+		logging->addLayout("defaultLayout", std::move(layout));
 
-	{
-		std::unique_ptr<esl::monitoring::Appender> appender(new common4esl::monitoring::OStreamAppender({
-			{"trace", "out"},
-			{"debug", "out"},
-			{"info", "out"},
-			{"warn", "out"},
-			{"error", "out"}
-		}));
-		appender->setRecordLevel(esl::monitoring::Appender::RecordLevel::SELECTED);
-		esl::monitoring::Logging::get()->addAppender("ostream", "defaultLayout", std::move(appender));
-	}
+		{
+			auto appender = esl::monitoring::OStreamAppender::create({
+				{"trace", "out"},
+				{"debug", "out"},
+				{"info", "out"},
+				{"warn", "out"},
+				{"error", "out"}
+			});
+			logging->addAppender("ostream", "defaultLayout", std::move(appender));
+		}
 
-	{
-		std::unique_ptr<esl::monitoring::Appender> appender(new common4esl::monitoring::MemBufferAppender({
-			{"max-lines", "100"},
-			{"max-columns", "100"}
-		}));
-		appender->setRecordLevel(esl::monitoring::Appender::RecordLevel::ALL);
-		esl::monitoring::Logging::get()->addAppender("mem-buffer", "defaultLayout", std::move(appender));
-	}
+		{
+			auto appender = esl::monitoring::MemBufferAppender::create({
+				{"max-lines", "100"},
+				{"max-columns", "100"}
+			});
+			logging->addAppender("mem-buffer", "defaultLayout", std::move(appender));
+		}
 
-	esl::monitoring::Logging::get()->setLevel(esl::monitoring::Level::WARN, "*");
+		logging->setLevel(esl::monitoring::Streams::Level::warn, "*");
+
+		registry.setObject(std::move(logging));
+	}
 
 
 	try {
@@ -85,9 +84,12 @@ float Example04::divide(float a, float b) {
 }
 
 void Example04::loggerReplay() {
-	std::stringstream sstream;
-	esl::monitoring::Logging::get()->flush(&sstream);
-	std::cout << "Replay: " << sstream.str() << "\n";
+	auto logging = esl::plugin::Registry::get().findObject<esl::monitoring::Logging>();
+	if(logging) {
+		std::stringstream sstream;
+		logging->flush(&sstream);
+		std::cout << "Replay: " << sstream.str() << "\n";
+	}
 }
 
 } /* inline namespace v1_6 */

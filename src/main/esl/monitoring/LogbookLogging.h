@@ -7,8 +7,6 @@
 #include <esl/monitoring/OStream.h>
 #include <esl/monitoring/Streams.h>
 
-#include <boost/filesystem/path.hpp>
-
 #include <memory>
 #include <string>
 #include <thread>
@@ -42,7 +40,7 @@ public:
 	void flush(std::ostream* oStream) override;
 
 	void addData(const std::string& configuration) override;
-	void addFile(const boost::filesystem::path& filename) override;
+	void addFile(const std::string& filename) override;
 	void addLayout(const std::string& id, std::unique_ptr<Layout> layout) override;
 	void addAppender(const std::string& name, const std::string& layoutRefId, std::unique_ptr<Appender> appender) override;
 

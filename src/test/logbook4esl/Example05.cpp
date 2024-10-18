@@ -1,9 +1,11 @@
 #include "logbook4esl/Example05.h"
 #include "logbook4esl/Logger.h"
 
-#include <logbook4esl/monitoring/Logging.h>
-
-#include <esl/monitoring/Logging.h>
+#include <esl/monitoring/LogbookLogging.h>
+#include <esl/monitoring/MemBufferAppender.h>
+#include <esl/monitoring/OStreamAppender.h>
+#include <esl/monitoring/SimpleLayout.h>
+#include <esl/plugin/Registry.h>
 
 namespace logbook4esl {
 inline namespace v1_6 {
@@ -14,16 +16,18 @@ Logger logger("logbook4esl::Example05");
 }
 
 void Example05::run() {
-	std::unique_ptr<esl::monitoring::Logging> aLogging(new logbook4esl::monitoring::Logging({}));
-	esl::monitoring::Logging::init(std::move(aLogging));
-	esl::monitoring::Logging::get()->addFile("logger.xml");
+	esl::plugin::Registry& registry(esl::plugin::Registry::get());
+	registry.addPlugin("esl/monitoring/MemBufferAppender", esl::monitoring::MemBufferAppender::create);
+	registry.addPlugin("esl/monitoring/OStreamAppender", esl::monitoring::OStreamAppender::create);
+	registry.addPlugin("esl/monitoring/DefaultLayout", esl::monitoring::SimpleLayout::create);
+	{
+		auto logging = esl::monitoring::LogbookLogging::createNative();
+		logging->addFile("logger.xml");
+		registry.setObject(std::move(logging));
+	}
 
 	/* That's it, now you can use it already */
 	logger.info << "Hello world!" << std::endl;
-
-	/* Ups, you see nothing.
-	 * We have not "initialized" the logging framework.
-	 * Let's go to logger example 2 to see how to initialize... */
 }
 
 } /* inline namespace v1_6 */
