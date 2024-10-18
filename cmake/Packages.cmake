@@ -60,6 +60,47 @@ function(find_package_esl)
     find_custom_package(esl https://github.com/SLukasDE/esl master)
 endfunction()
 
+function(find_package_common4esl)
+    find_custom_package(common4esl https://github.com/SLukasDE/common4esl main)
+endfunction()
+
 function(find_package_logbook)
     find_custom_package(logbook https://github.com/SLukasDE/logbook master)
+endfunction()
+
+
+
+function(find_package_TinyXML2)
+    # Default, try 'find_package'. VCPKG or Conan may be used, if enabled
+    if(NOT tinyxml2_FOUND)
+        message(STATUS "Try to find TinyXML2 by find_package")
+        find_package(tinyxml2 QUIET)
+        if(tinyxml2_FOUND)
+            message(STATUS "TinyXML2 has been found by using find_package")
+        endif()
+    endif()
+	
+    if(NOT tinyxml2_FOUND)
+        message(STATUS "Try to find TinyXML2 by FetchContent")
+        #set(tinyxml2_SHARED_LIBS ON CACHE INTERNAL "Build SHARED libraries")
+        FetchContent_Declare(
+            tinyxml2
+            GIT_REPOSITORY https://github.com/leethomason/TinyXML2
+            GIT_TAG 10.0.0
+            GIT_SHALLOW TRUE
+            OVERRIDE_FIND_PACKAGE # 'find_package(...)' will call 'FetchContent_MakeAvailable(...)'
+        )
+        find_package(tinyxml2 QUIET)
+        if(tinyxml2_FOUND)
+            message(STATUS "TinyXML2 has been found by using FetchContent")
+        endif()
+    endif()
+	
+    if(NOT tinyxml2_FOUND)
+        message(FATAL_ERROR "TinyXML2 NOT found")
+    endif()
+	
+	if(NOT TARGET tinyxml2::tinyxml2)
+        message(FATAL_ERROR "TARGET tinyxml2::tinyxml2 does not exists")
+    endif()
 endfunction()
